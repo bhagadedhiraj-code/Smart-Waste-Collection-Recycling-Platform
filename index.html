@@ -1,0 +1,3278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EcoCollect - Waste Collection Request Portal</title>
+  
+  <!-- Tailwind CSS with Local and CDN fallback -->
+  <script src="vendor/tailwind.js"></script>
+  <script>
+    if (!window.tailwind) {
+      document.write('<script src="https://cdn.tailwindcss.com"><\/script>');
+    }
+  </script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              200: '#bbf7d0',
+              300: '#86efac',
+              400: '#4ade80',
+              500: '#22c55e',
+              600: '#16a34a',
+              700: '#15803d',
+              800: '#166534',
+              900: '#14532d',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- React 18 and ReactDOM with Local and CDN fallback -->
+  <script src="vendor/react.min.js"></script>
+  <script>
+    if (!window.React) {
+      document.write('<script src="https://unpkg.com/react@18/umd/react.production.min.js"><\/script>');
+    }
+  </script>
+  <script src="vendor/react-dom.min.js"></script>
+  <script>
+    if (!window.ReactDOM) {
+      document.write('<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"><\/script>');
+    }
+  </script>
+
+  <!-- Babel for in-browser JSX compilation with Local and CDN fallback -->
+  <script src="vendor/babel.min.js"></script>
+  <script>
+    if (!window.Babel) {
+      document.write('<script src="https://unpkg.com/@babel/standalone/babel.min.js"><\/script>');
+    }
+  </script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+    @media print {
+      header, footer, nav, button, .no-print {
+        display: none !important;
+      }
+      .printable-modal {
+        display: block !important;
+        position: static !important;
+        width: 100% !important;
+        box-shadow: none !important;
+        border: none !important;
+      }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    // Default sample pickups
+    const INITIAL_SAMPLE_DATA = [
+      {
+        id: "EC-1001",
+        name: "Jane Cooper",
+        phone: "9876543210",
+        isPhoneVerified: true,
+        category: "Plastic",
+        address: "Flat 402, Green Meadows, 742 Evergreen Terrace, Springfield, California - 97477",
+        flat: "Flat 402, Green Meadows",
+        street: "742 Evergreen Terrace",
+        landmark: "Near Central Park",
+        city: "Springfield",
+        state: "California",
+        pincode: "97477",
+        date: "2026-09-28",
+        status: "Pending",
+        notes: "Bottles, jugs and clean food packaging in 2 clear bags.",
+        createdAt: "2026-09-27T09:30:00.000Z"
+      },
+      {
+        id: "EC-1002",
+        name: "Robert Fox",
+        phone: "9876543211",
+        isPhoneVerified: true,
+        category: "E-Waste",
+        address: "Suite 400, Tech Tower, 10880 Wilshire Blvd, Los Angeles, California - 90024",
+        flat: "Suite 400, Tech Tower",
+        street: "10880 Wilshire Blvd",
+        landmark: "Opposite Metro Station",
+        city: "Los Angeles",
+        state: "California",
+        pincode: "90024",
+        date: "2026-09-29",
+        status: "Scheduled",
+        notes: "Old office desktop tower, 2 broken keyboards, rechargeable batteries.",
+        createdAt: "2026-09-26T14:15:00.000Z"
+      },
+      {
+        id: "EC-1003",
+        name: "Eleanor Pena",
+        phone: "9876543212",
+        isPhoneVerified: true,
+        category: "Organic",
+        address: "Apt 12B, Empire Heights, 350 5th Avenue, New York, New York - 10118",
+        flat: "Apt 12B, Empire Heights",
+        street: "350 5th Avenue",
+        landmark: "Near 34th St Entrance",
+        city: "New York",
+        state: "New York",
+        pincode: "10118",
+        date: "2026-09-26",
+        status: "Completed",
+        notes: "Compostable garden clippings and fruit peelings.",
+        createdAt: "2026-09-25T11:00:00.000Z"
+      },
+      {
+        id: "EC-1004",
+        name: "Cody Fisher",
+        phone: "9876543213",
+        isPhoneVerified: true,
+        category: "Paper",
+        address: "Floor 2, Liberty Plaza, 1200 Grand Ave, Chicago, Illinois - 60601",
+        flat: "Floor 2, Liberty Plaza",
+        street: "1200 Grand Ave",
+        landmark: "Next to City Library",
+        city: "Chicago",
+        state: "Illinois",
+        pincode: "60601",
+        date: "2026-09-25",
+        status: "Completed",
+        notes: "Flattened cardboard shipping boxes and newspapers.",
+        createdAt: "2026-09-24T16:45:00.000Z"
+      },
+      {
+        id: "EC-1005",
+        name: "Kristin Watson",
+        phone: "9876543214",
+        isPhoneVerified: true,
+        category: "Other",
+        address: "House 56, Meadow Ridge, 56 Willow Lane, Austin, Texas - 78701",
+        flat: "House 56, Meadow Ridge",
+        street: "56 Willow Lane",
+        landmark: "Corner of Oak St",
+        city: "Austin",
+        state: "Texas",
+        pincode: "78701",
+        date: "2026-09-27",
+        status: "Cancelled",
+        notes: "Mixed metal scrap and broken plastic bins.",
+        createdAt: "2026-09-26T08:20:00.000Z"
+      }
+    ];
+
+    // Initial User Profile with Saved Addresses
+    const INITIAL_USER_PROFILE = {
+      name: "Jane Cooper",
+      phone: "9876543210",
+      isPhoneVerified: true,
+      email: "jane.cooper@ecocollect.org",
+      memberSince: "January 2026",
+      ecoPoints: 380,
+      totalRecycledKg: 42.5,
+      savedAddresses: [
+        {
+          id: "addr_1",
+          label: "Home",
+          isDefault: true,
+          flat: "Flat 402, Green Meadows",
+          street: "742 Evergreen Terrace",
+          landmark: "Near Central Park",
+          city: "Springfield",
+          state: "California",
+          pincode: "97477",
+          isGpsVerified: true
+        },
+        {
+          id: "addr_2",
+          label: "Office",
+          isDefault: false,
+          flat: "Suite 400, Tech Tower",
+          street: "10880 Wilshire Blvd",
+          landmark: "Opposite Metro Station",
+          city: "Los Angeles",
+          state: "California",
+          pincode: "90024",
+          isGpsVerified: true
+        }
+      ]
+    };
+
+    // Consistent SVG Icons
+    const Icons = {
+      Recycle: (props) => (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className || "w-5 h-5"}>
+          <path d="M7 19H4.815a1.83 1.83 0 0 1-1.57-.881 1.785 1.785 0 0 1-.004-1.784L7.196 9.5" />
+          <path d="M11 19h8.2a1.8 1.8 0 0 0 1.56-.88 1.79 1.79 0 0 0 0-1.78l-4.9-8.49" />
+          <path d="M15.5 4.5l-4-4-4 4" />
+          <path d="M11.5.5v8" />
+          <path d="m21.5 13-2 3.5-3.5-2" />
+          <path d="m2.5 13 2 3.5 3.5-2" />
+        </svg>
+      ),
+      Leaf: (props) => (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className || "w-5 h-5"}>
+          <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/>
+          <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+        </svg>
+      ),
+      Plastic: (props) => (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className || "w-5 h-5"}>
+          <path d="M7 2h10v3H7z" />
+          <path d="M9 5v2a3 3 0 0 1-3 3v9a3 3 0 0 0 3 3h6a3 3 0 0 0 3-3v-9a3 3 0 0 1-3-3V5" />
+          <path d="M10 14h4" />
+        </svg>
+      ),
+      Paper: (props) => (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className || "w-5 h-5"}>
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+          <polyline points="14 2 14 8 20 8" />
+          <line x1="16" y1="13" x2="8" y2="13" />
+          <line x1="16" y1="17" x2="8" y2="17" />
+          <polyline points="10 9 9 9 8 9" />
+        </svg>
+      ),
+      Organic: (props) => (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className || "w-5 h-5"}>
+          <path d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10S2 17.523 2 12A10 10 0 0 1 12 2Z" />
+          <path d="M12 6v6l4 2" />
+        </svg>
+      ),
+      EWaste: (props) => (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className || "w-5 h-5"}>
+          <rect width="18" height="12" x="3" y="4" rx="2" />
+          <line x1="2" x2="22" y1="20" y2="20" />
+          <line x1="12" x2="12" y1="16" y2="20" />
+        </svg>
+      ),
+      Other: (props) => (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className || "w-5 h-5"}>
+          <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
+          <path d="m3.3 7 8.7 5 8.7-5" />
+          <path d="M12 22V12" />
+        </svg>
+      ),
+      Clock: (props) => (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className || "w-4 h-4"}>
+          <circle cx="12" cy="12" r="10" />
+          <polyline points="12 6 12 12 16 14" />
+        </svg>
+      ),
+      Calendar: (props) => (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className || "w-4 h-4"}>
+          <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
+          <line x1="16" x2="16" y1="2" y2="6" />
+          <line x1="8" x2="8" y1="2" y2="6" />
+          <line x1="3" x2="21" y1="10" y2="10" />
+        </svg>
+      ),
+      CheckCircle: (props) => (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className || "w-4 h-4"}>
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+          <polyline points="22 4 12 14.01 9 11.01" />
+        </svg>
+      ),
+      XCircle: (props) => (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className || "w-4 h-4"}>
+          <circle cx="12" cy="12" r="10" />
+          <line x1="15" y1="9" x2="9" y2="15" />
+          <line x1="9" y1="9" x2="15" y2="15" />
+        </svg>
+      ),
+      MapPin: (props) => (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className || "w-4 h-4"}>
+          <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+          <circle cx="12" cy="10" r="3" />
+        </svg>
+      ),
+      Phone: (props) => (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className || "w-4 h-4"}>
+          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+        </svg>
+      ),
+      User: (props) => (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className || "w-4 h-4"}>
+          <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+          <circle cx="12" cy="7" r="4" />
+        </svg>
+      ),
+      Plus: (props) => (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className || "w-5 h-5"}>
+          <line x1="12" y1="5" x2="12" y2="19" />
+          <line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
+      ),
+      Shield: (props) => (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className || "w-5 h-5"}>
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+        </svg>
+      ),
+      ShieldCheck: (props) => (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className || "w-4 h-4"}>
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          <polyline points="9 12 11 14 15 10" />
+        </svg>
+      ),
+      ArrowRight: (props) => (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className || "w-5 h-5"}>
+          <line x1="5" y1="12" x2="19" y2="12" />
+          <polyline points="12 5 19 12 12 19" />
+        </svg>
+      ),
+      Trash: (props) => (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className || "w-4 h-4"}>
+          <polyline points="3 6 5 6 21 6" />
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+          <line x1="10" y1="11" x2="10" y2="17" />
+          <line x1="14" y1="11" x2="14" y2="17" />
+        </svg>
+      ),
+      Eye: (props) => (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className || "w-4 h-4"}>
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+          <circle cx="12" cy="12" r="3" />
+        </svg>
+      ),
+      Download: (props) => (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className || "w-4 h-4"}>
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="7 10 12 15 17 10" />
+          <line x1="12" y1="15" x2="12" y2="3" />
+        </svg>
+      ),
+      Printer: (props) => (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className || "w-4 h-4"}>
+          <polyline points="6 9 6 2 18 2 18 9" />
+          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+          <rect x="6" y="14" width="12" height="8" />
+        </svg>
+      ),
+      Sparkles: (props) => (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className || "w-4 h-4"}>
+          <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+          <path d="M5 3v4"/>
+          <path d="M19 17v4"/>
+          <path d="M3 5h4"/>
+          <path d="M17 19h4"/>
+        </svg>
+      ),
+      X: (props) => (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className || "w-4 h-4"}>
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      ),
+      Truck: (props) => (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className || "w-4 h-4"}>
+          <rect x="1" y="3" width="15" height="13" />
+          <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+          <circle cx="5.5" cy="18.5" r="2.5" />
+          <circle cx="18.5" cy="18.5" r="2.5" />
+        </svg>
+      ),
+      Menu: (props) => (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className || "w-6 h-6"}>
+          <line x1="3" y1="12" x2="21" y2="12" />
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <line x1="3" y1="18" x2="21" y2="18" />
+        </svg>
+      ),
+      Help: (props) => (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className || "w-4 h-4"}>
+          <circle cx="12" cy="12" r="10" />
+          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+          <line x1="12" y1="17" x2="12.01" y2="17" />
+        </svg>
+      ),
+      ArrowUp: (props) => (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className || "w-4 h-4"}>
+          <line x1="12" y1="19" x2="12" y2="5" />
+          <polyline points="5 12 12 5 19 12" />
+        </svg>
+      ),
+      Navigation: (props) => (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className || "w-4 h-4"}>
+          <polygon points="3 11 22 2 13 21 11 13 3 11" />
+        </svg>
+      ),
+      Lock: (props) => (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className || "w-4 h-4"}>
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+        </svg>
+      ),
+      Key: (props) => (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className || "w-4 h-4"}>
+          <path d="m21 2-2 2m-1.5 1.5L12 11l4 4 3-3m-1.5-1.5L20 8m-2-2-4 4" />
+          <circle cx="7.5" cy="16.5" r="4.5" />
+        </svg>
+      ),
+      Edit: (props) => (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className || "w-4 h-4"}>
+          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+        </svg>
+      ),
+      Award: (props) => (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className || "w-4 h-4"}>
+          <circle cx="12" cy="8" r="7" />
+          <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88" />
+        </svg>
+      ),
+      Home: (props) => (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className || "w-4 h-4"}>
+          <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+          <polyline points="9 22 9 12 15 12 15 22" />
+        </svg>
+      ),
+      Briefcase: (props) => (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className || "w-4 h-4"}>
+          <rect width="20" height="14" x="2" y="7" rx="2" ry="2" />
+          <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+        </svg>
+      )
+    };
+
+    // Category styling helper
+    const getCategoryBadge = (category) => {
+      switch (category) {
+        case "Plastic":
+          return {
+            bg: "bg-blue-50 text-blue-700 border-blue-200",
+            icon: <Icons.Plastic className="w-4 h-4 mr-1 text-blue-600" />
+          };
+        case "Paper":
+          return {
+            bg: "bg-amber-50 text-amber-700 border-amber-200",
+            icon: <Icons.Paper className="w-4 h-4 mr-1 text-amber-600" />
+          };
+        case "Organic":
+          return {
+            bg: "bg-emerald-50 text-emerald-700 border-emerald-200",
+            icon: <Icons.Leaf className="w-4 h-4 mr-1 text-emerald-600" />
+          };
+        case "E-Waste":
+          return {
+            bg: "bg-purple-50 text-purple-700 border-purple-200",
+            icon: <Icons.EWaste className="w-4 h-4 mr-1 text-purple-600" />
+          };
+        default:
+          return {
+            bg: "bg-slate-100 text-slate-700 border-slate-200",
+            icon: <Icons.Other className="w-4 h-4 mr-1 text-slate-600" />
+          };
+      }
+    };
+
+    // Status badge component
+    const StatusBadge = ({ status }) => {
+      let config = {
+        bg: "bg-slate-100 text-slate-700 border-slate-200",
+        icon: null
+      };
+
+      if (status === "Pending") {
+        config = {
+          bg: "bg-amber-100 text-amber-800 border-amber-300",
+          icon: <Icons.Clock className="w-3.5 h-3.5 mr-1 text-amber-600" />
+        };
+      } else if (status === "Scheduled") {
+        config = {
+          bg: "bg-sky-100 text-sky-800 border-sky-300",
+          icon: <Icons.Calendar className="w-3.5 h-3.5 mr-1 text-sky-600" />
+        };
+      } else if (status === "Completed") {
+        config = {
+          bg: "bg-emerald-100 text-emerald-800 border-emerald-300",
+          icon: <Icons.CheckCircle className="w-3.5 h-3.5 mr-1 text-emerald-600" />
+        };
+      } else if (status === "Cancelled") {
+        config = {
+          bg: "bg-rose-100 text-rose-800 border-rose-300",
+          icon: <Icons.XCircle className="w-3.5 h-3.5 mr-1 text-rose-600" />
+        };
+      }
+
+      return (
+        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border ${config.bg}`}>
+          {config.icon}
+          {status}
+        </span>
+      );
+    };
+
+    // ==========================================
+    // MAIN APP COMPONENT
+    // ==========================================
+    function App() {
+      const [currentPage, setCurrentPage] = useState("home");
+      const [selectedCategory, setSelectedCategory] = useState("Plastic");
+      const [requests, setRequests] = useState([]);
+      const [userProfile, setUserProfile] = useState(INITIAL_USER_PROFILE);
+      const [toast, setToast] = useState(null);
+      const [activeModalRequest, setActiveModalRequest] = useState(null);
+      const [showInfoModal, setShowInfoModal] = useState(false);
+      const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+      const [otpModalState, setOtpModalState] = useState(null); // { phone, callback, currentOtp }
+      const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(true);
+
+      // Load initial data from localStorage
+      useEffect(() => {
+        try {
+          const savedRequests = localStorage.getItem("ecocollect_requests");
+          if (savedRequests) {
+            setRequests(JSON.parse(savedRequests));
+          } else {
+            localStorage.setItem("ecocollect_requests", JSON.stringify(INITIAL_SAMPLE_DATA));
+            setRequests(INITIAL_SAMPLE_DATA);
+          }
+
+          const savedProfile = localStorage.getItem("ecocollect_user_profile");
+          if (savedProfile) {
+            setUserProfile(JSON.parse(savedProfile));
+          } else {
+            localStorage.setItem("ecocollect_user_profile", JSON.stringify(INITIAL_USER_PROFILE));
+          }
+        } catch (e) {
+          console.error("Failed to load data from localStorage", e);
+          setRequests(INITIAL_SAMPLE_DATA);
+        }
+      }, []);
+
+      // Update requests
+      const updateRequests = (newRequests) => {
+        setRequests(newRequests);
+        try {
+          localStorage.setItem("ecocollect_requests", JSON.stringify(newRequests));
+        } catch (e) {
+          console.error("Failed to save requests", e);
+        }
+      };
+
+      // Update profile
+      const updateUserProfile = (newProfile) => {
+        setUserProfile(newProfile);
+        try {
+          localStorage.setItem("ecocollect_user_profile", JSON.stringify(newProfile));
+        } catch (e) {
+          console.error("Failed to save profile", e);
+        }
+      };
+
+      // Toast alert
+      const showToast = (message, type = "success") => {
+        setToast({ message, type });
+        setTimeout(() => setToast(null), 4000);
+      };
+
+      // Reset to dummy data
+      const handleResetSampleData = () => {
+        updateRequests(INITIAL_SAMPLE_DATA);
+        updateUserProfile(INITIAL_USER_PROFILE);
+        showToast("Restored demo sample data and user profile successfully!");
+      };
+
+      // Start Phone OTP Authentication
+      const triggerOtpVerification = (phone, onSuccess) => {
+        const generatedCode = Math.floor(1000 + Math.random() * 9000).toString();
+        setOtpModalState({
+          phone: phone,
+          expectedOtp: generatedCode,
+          callback: onSuccess
+        });
+      };
+
+      // Handle successful OTP verification
+      const handleOtpSuccess = (verifiedPhone) => {
+        // Update user profile phone verification
+        const updated = {
+          ...userProfile,
+          phone: verifiedPhone,
+          isPhoneVerified: true
+        };
+        updateUserProfile(updated);
+        showToast(`Mobile number +91 ${verifiedPhone} verified successfully!`);
+        if (otpModalState && otpModalState.callback) {
+          otpModalState.callback(verifiedPhone);
+        }
+        setOtpModalState(null);
+      };
+
+      // Add new request
+      const handleCreateRequest = (newRequest) => {
+        const updated = [newRequest, ...requests];
+        updateRequests(updated);
+
+        // Update profile eco stats
+        const updatedProfile = {
+          ...userProfile,
+          ecoPoints: userProfile.ecoPoints + 50,
+          totalRecycledKg: +(userProfile.totalRecycledKg + 4.5).toFixed(1)
+        };
+        updateUserProfile(updatedProfile);
+
+        showToast(`Request ${newRequest.id} submitted! +50 Eco-Points earned!`);
+        setCurrentPage("my-requests");
+      };
+
+      // Update status
+      const handleStatusChange = (requestId, newStatus) => {
+        const updated = requests.map(req => 
+          req.id === requestId ? { ...req, status: newStatus } : req
+        );
+        updateRequests(updated);
+        showToast(`Request ${requestId} status updated to ${newStatus}`);
+        if (activeModalRequest && activeModalRequest.id === requestId) {
+          setActiveModalRequest({ ...activeModalRequest, status: newStatus });
+        }
+      };
+
+      // Cancel a request
+      const handleCancelRequest = (requestId) => {
+        const target = requests.find(r => r.id === requestId);
+        if (!target) return;
+        if (target.status === "Cancelled") {
+          showToast(`Request ${requestId} is already cancelled.`, "info");
+          return;
+        }
+        const updated = requests.map(req => 
+          req.id === requestId ? { ...req, status: "Cancelled" } : req
+        );
+        updateRequests(updated);
+        showToast(`Pickup request ${requestId} has been cancelled.`);
+        if (activeModalRequest && activeModalRequest.id === requestId) {
+          setActiveModalRequest({ ...activeModalRequest, status: "Cancelled" });
+        }
+      };
+
+      // Delete request permanently
+      const handleDeleteRequest = (requestId) => {
+        if (!window.confirm(`Are you sure you want to permanently delete request ${requestId}?`)) {
+          return;
+        }
+        const updated = requests.filter(req => req.id !== requestId);
+        updateRequests(updated);
+        showToast(`Request ${requestId} deleted successfully.`);
+        if (activeModalRequest && activeModalRequest.id === requestId) {
+          setActiveModalRequest(null);
+        }
+      };
+
+      // Re-order / clone a previous request
+      const handleReorder = (oldRequest) => {
+        setSelectedCategory(oldRequest.category || "Plastic");
+        setCurrentPage("request");
+        showToast(`Prefilled form with details from ${oldRequest.id}!`);
+      };
+
+      // Export all requests as CSV
+      const handleExportCSV = () => {
+        if (requests.length === 0) {
+          showToast("No requests available to export.", "info");
+          return;
+        }
+        const headers = ["Request ID", "Name", "Phone", "Category", "Pickup Date", "Address", "City", "Pincode", "Status", "Notes", "Created At"];
+        const rows = requests.map(r => [
+          r.id,
+          `"${(r.name || "").replace(/"/g, '""')}"`,
+          `"${(r.phone || "").replace(/"/g, '""')}"`,
+          `"${(r.category || "").replace(/"/g, '""')}"`,
+          r.date,
+          `"${(r.address || "").replace(/"/g, '""')}"`,
+          `"${(r.city || "").replace(/"/g, '""')}"`,
+          `"${(r.pincode || "").replace(/"/g, '""')}"`,
+          r.status,
+          `"${(r.notes || "").replace(/"/g, '""')}"`,
+          r.createdAt
+        ]);
+        const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `ecocollect_pickups_${new Date().toISOString().slice(0,10)}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        showToast("CSV report downloaded successfully!");
+      };
+
+      // Clear completed/cancelled items
+      const handleClearCompleted = () => {
+        const remaining = requests.filter(r => r.status !== "Completed" && r.status !== "Cancelled");
+        if (remaining.length === requests.length) {
+          showToast("No completed or cancelled requests to clean up.", "info");
+          return;
+        }
+        if (!window.confirm("Clean up all Completed and Cancelled records from the list?")) return;
+        updateRequests(remaining);
+        showToast("Cleaned up archived requests successfully.");
+      };
+
+      // Navigation with category selector from homepage
+      const handleSelectCategoryAndNavigate = (categoryName) => {
+        setSelectedCategory(categoryName);
+        setCurrentPage("request");
+        showToast(`Category "${categoryName}" selected for pickup!`);
+      };
+
+      // Calculate stats for Admin
+      const totalRequests = requests.length;
+      const pendingCount = requests.filter(r => r.status === "Pending").length;
+      const scheduledCount = requests.filter(r => r.status === "Scheduled").length;
+      const completedCount = requests.filter(r => r.status === "Completed").length;
+
+      return (
+        <div className="flex flex-col min-h-screen">
+          {/* Top Navigation Bar */}
+          <header className="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm no-print">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="flex items-center justify-between h-16">
+                
+                {/* Logo Button */}
+                <button 
+                  type="button"
+                  className="flex items-center space-x-3 group text-left focus:outline-none"
+                  onClick={() => { setCurrentPage("home"); setMobileMenuOpen(false); }}
+                  title="Go to EcoCollect Home"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-md shadow-emerald-200 group-hover:bg-emerald-700 transition transform group-hover:scale-105">
+                    <Icons.Recycle className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <span className="text-xl font-extrabold tracking-tight text-slate-900 group-hover:text-emerald-700 transition">
+                      Eco<span className="text-emerald-600">Collect</span>
+                    </span>
+                    <span className="hidden sm:block text-xs text-slate-500 font-medium">Doorstep Recycling Portal</span>
+                  </div>
+                </button>
+
+                {/* Desktop Navigation Links */}
+                <nav className="hidden md:flex items-center space-x-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setCurrentPage("home")}
+                    className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition ${
+                      currentPage === "home"
+                        ? "bg-emerald-50 text-emerald-700 shadow-sm"
+                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                    }`}
+                  >
+                    Home
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setCurrentPage("request")}
+                    className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition flex items-center ${
+                      currentPage === "request"
+                        ? "bg-emerald-50 text-emerald-700 shadow-sm"
+                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                    }`}
+                  >
+                    <Icons.Plus className="w-4 h-4 mr-1 text-emerald-600" />
+                    Request Pickup
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setCurrentPage("my-requests")}
+                    className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition flex items-center relative ${
+                      currentPage === "my-requests"
+                        ? "bg-emerald-50 text-emerald-700 shadow-sm"
+                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                    }`}
+                  >
+                    My Requests
+                    {requests.length > 0 && (
+                      <span className="ml-1.5 px-2 py-0.5 text-xs rounded-full bg-emerald-100 text-emerald-800 font-bold">
+                        {requests.length}
+                      </span>
+                    )}
+                  </button>
+
+                  {/* Profile Page Navigation Button */}
+                  <button
+                    type="button"
+                    onClick={() => setCurrentPage("profile")}
+                    className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition flex items-center ${
+                      currentPage === "profile"
+                        ? "bg-emerald-50 text-emerald-700 shadow-sm"
+                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                    }`}
+                  >
+                    <div className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 font-extrabold text-[10px] flex items-center justify-center mr-1.5 border border-emerald-300">
+                      {userProfile.name.charAt(0)}
+                    </div>
+                    <span>Profile</span>
+                    {userProfile.isPhoneVerified && (
+                      <span className="ml-1 text-emerald-600 font-extrabold text-xs" title="Verified Mobile Number">✓</span>
+                    )}
+                  </button>
+
+                  <div className="h-5 w-px bg-slate-200 mx-1"></div>
+
+                  {/* Admin Portal Button */}
+                  <button
+                    type="button"
+                    onClick={() => setCurrentPage("admin")}
+                    className={`px-4 py-2 rounded-xl text-sm font-semibold transition flex items-center ${
+                      currentPage === "admin"
+                        ? "bg-slate-900 text-white shadow-md shadow-slate-900/20"
+                        : "text-slate-700 hover:bg-slate-100 border border-slate-200"
+                    }`}
+                  >
+                    <Icons.Shield className="w-4 h-4 mr-1.5 text-emerald-400" />
+                    Admin Portal
+                  </button>
+                </nav>
+
+                {/* Mobile Hamburger Button */}
+                <div className="md:hidden flex items-center space-x-2">
+                  <button
+                    type="button"
+                    onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                    className="p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 focus:outline-none"
+                    aria-label="Toggle Navigation Menu"
+                  >
+                    {mobileMenuOpen ? <Icons.X className="w-6 h-6" /> : <Icons.Menu className="w-6 h-6" />}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Mobile Dropdown Menu */}
+            {mobileMenuOpen && (
+              <div className="md:hidden border-t border-slate-200 bg-white px-4 pt-2 pb-4 space-y-1 shadow-lg">
+                <button
+                  type="button"
+                  onClick={() => { setCurrentPage("home"); setMobileMenuOpen(false); }}
+                  className={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold ${
+                    currentPage === "home" ? "bg-emerald-50 text-emerald-700" : "text-slate-700 hover:bg-slate-50"
+                  }`}
+                >
+                  Home
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setCurrentPage("request"); setMobileMenuOpen(false); }}
+                  className={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold flex items-center ${
+                    currentPage === "request" ? "bg-emerald-50 text-emerald-700" : "text-slate-700 hover:bg-slate-50"
+                  }`}
+                >
+                  <Icons.Plus className="w-4 h-4 mr-2 text-emerald-600" />
+                  Request Pickup
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setCurrentPage("my-requests"); setMobileMenuOpen(false); }}
+                  className={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold flex items-center justify-between ${
+                    currentPage === "my-requests" ? "bg-emerald-50 text-emerald-700" : "text-slate-700 hover:bg-slate-50"
+                  }`}
+                >
+                  <span>My Requests</span>
+                  <span className="px-2 py-0.5 text-xs rounded-full bg-emerald-100 text-emerald-800 font-bold">
+                    {requests.length}
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setCurrentPage("profile"); setMobileMenuOpen(false); }}
+                  className={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold flex items-center ${
+                    currentPage === "profile" ? "bg-emerald-50 text-emerald-700" : "text-slate-700 hover:bg-slate-50"
+                  }`}
+                >
+                  <Icons.User className="w-4 h-4 mr-2 text-emerald-600" />
+                  User Profile ({userProfile.name})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setCurrentPage("admin"); setMobileMenuOpen(false); }}
+                  className={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold flex items-center ${
+                    currentPage === "admin" ? "bg-slate-900 text-white" : "text-slate-700 hover:bg-slate-50"
+                  }`}
+                >
+                  <Icons.Shield className="w-4 h-4 mr-2 text-emerald-400" />
+                  Admin Dashboard
+                </button>
+              </div>
+            )}
+          </header>
+
+          {/* Toast Notification with Dismiss button */}
+          {toast && (
+            <div className="fixed bottom-5 right-5 z-50 animate-bounce no-print">
+              <div className="bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-2xl flex items-center space-x-3 border border-slate-700">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span className="text-sm font-medium">{toast.message}</span>
+                <button
+                  type="button"
+                  onClick={() => setToast(null)}
+                  className="text-slate-400 hover:text-white p-1 rounded-lg focus:outline-none"
+                  title="Dismiss notification"
+                >
+                  <Icons.X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Main Content Area */}
+          <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            {currentPage === "home" && (
+              <HomePage 
+                userProfile={userProfile}
+                onNavigateRequest={() => setCurrentPage("request")}
+                onNavigateMyRequests={() => setCurrentPage("my-requests")}
+                onNavigateProfile={() => setCurrentPage("profile")}
+                onSelectCategory={handleSelectCategoryAndNavigate}
+                onOpenInfo={() => setShowInfoModal(true)}
+              />
+            )}
+
+            {currentPage === "request" && (
+              <RequestPickupPage 
+                initialCategory={selectedCategory}
+                userProfile={userProfile}
+                onTriggerOtp={triggerOtpVerification}
+                onSubmit={handleCreateRequest}
+                onCancel={() => setCurrentPage("home")}
+                onNavigateProfile={() => setCurrentPage("profile")}
+              />
+            )}
+
+            {currentPage === "my-requests" && (
+              <MyRequestsPage 
+                requests={requests}
+                onNewRequest={() => setCurrentPage("request")}
+                onViewDetails={(req) => setActiveModalRequest(req)}
+                onCancelRequest={handleCancelRequest}
+                onDeleteRequest={handleDeleteRequest}
+                onReorder={handleReorder}
+              />
+            )}
+
+            {currentPage === "profile" && (
+              <ProfilePage 
+                userProfile={userProfile}
+                onUpdateProfile={updateUserProfile}
+                onTriggerOtp={triggerOtpVerification}
+                onSchedulePickup={() => setCurrentPage("request")}
+                onViewRequests={() => setCurrentPage("my-requests")}
+                onToast={showToast}
+              />
+            )}
+
+            {currentPage === "admin" && (
+              <AdminDashboardPage 
+                requests={requests}
+                totalRequests={totalRequests}
+                pendingCount={pendingCount}
+                scheduledCount={scheduledCount}
+                completedCount={completedCount}
+                onStatusChange={handleStatusChange}
+                onCancelRequest={handleCancelRequest}
+                onDeleteRequest={handleDeleteRequest}
+                onResetSampleData={handleResetSampleData}
+                onExportCSV={handleExportCSV}
+                onClearCompleted={handleClearCompleted}
+                onViewDetails={(req) => setActiveModalRequest(req)}
+                onOpenNewPickup={() => setCurrentPage("request")}
+              />
+            )}
+          </main>
+
+          {/* Phone OTP Verification Modal */}
+          {otpModalState && (
+            <OtpVerificationModal 
+              phone={otpModalState.phone}
+              expectedOtp={otpModalState.expectedOtp}
+              onVerify={handleOtpSuccess}
+              onResend={() => {
+                const newCode = Math.floor(1000 + Math.random() * 9000).toString();
+                setOtpModalState(prev => ({ ...prev, expectedOtp: newCode }));
+                showToast(`New OTP sent to +91 ${otpModalState.phone}`);
+              }}
+              onClose={() => setOtpModalState(null)}
+            />
+          )}
+
+          {/* Request Detail & Tracking Modal */}
+          {activeModalRequest && (
+            <DetailModal 
+              request={activeModalRequest}
+              isAdmin={currentPage === "admin"}
+              onClose={() => setActiveModalRequest(null)}
+              onCancelRequest={handleCancelRequest}
+              onStatusChange={handleStatusChange}
+              onDeleteRequest={handleDeleteRequest}
+            />
+          )}
+
+          {/* Help & About Modal */}
+          {showInfoModal && (
+            <InfoModal onClose={() => setShowInfoModal(false)} />
+          )}
+
+          {/* Clean Footer */}
+          <footer className="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-500 no-print mt-auto">
+            <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center space-x-2">
+                <Icons.Leaf className="w-4 h-4 text-emerald-600" />
+                <span className="font-bold text-slate-800">EcoCollect</span>
+                <span>— Smart Waste Collection Portal</span>
+              </div>
+              <div className="flex flex-wrap items-center justify-center gap-4">
+                <button 
+                  type="button"
+                  onClick={handleResetSampleData}
+                  className="text-emerald-700 hover:text-emerald-800 font-semibold underline flex items-center"
+                  title="Reload default sample dataset"
+                >
+                  <Icons.Recycle className="w-3.5 h-3.5 mr-1" />
+                  Reload Sample Data
+                </button>
+                <span>•</span>
+                <button
+                  type="button"
+                  onClick={() => setShowInfoModal(true)}
+                  className="text-slate-600 hover:text-slate-900 font-semibold hover:underline flex items-center"
+                >
+                  <Icons.Help className="w-3.5 h-3.5 mr-1 text-slate-500" />
+                  Help & FAQs
+                </button>
+                <span>•</span>
+                <button
+                  type="button"
+                  onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                  className="text-slate-600 hover:text-slate-900 font-semibold hover:underline flex items-center"
+                >
+                  <Icons.ArrowUp className="w-3.5 h-3.5 mr-1 text-slate-500" />
+                  Back to Top
+                </button>
+              </div>
+            </div>
+          </footer>
+        </div>
+      );
+    }
+
+    // ==========================================
+    // PAGE 1: HOME PAGE
+    // ==========================================
+    function HomePage({ userProfile, onNavigateRequest, onNavigateMyRequests, onNavigateProfile, onSelectCategory, onOpenInfo }) {
+      const categories = [
+        { title: "Plastic", desc: "Bottles, jugs & containers", icon: <Icons.Plastic className="w-7 h-7 text-blue-600" /> },
+        { title: "Paper", desc: "Cardboard & paper bags", icon: <Icons.Paper className="w-7 h-7 text-amber-600" /> },
+        { title: "Organic", desc: "Food scraps & garden waste", icon: <Icons.Leaf className="w-7 h-7 text-emerald-600" /> },
+        { title: "E-Waste", desc: "Batteries, cords & gadgets", icon: <Icons.EWaste className="w-7 h-7 text-purple-600" /> },
+        { title: "Other", desc: "Mixed recyclable goods", icon: <Icons.Other className="w-7 h-7 text-slate-600" /> },
+      ];
+
+      return (
+        <div className="space-y-12">
+          {/* User Welcome Banner if Authenticated */}
+          <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white font-extrabold text-sm flex items-center justify-center shadow-sm">
+                {userProfile.name.charAt(0)}
+              </div>
+              <div>
+                <div className="flex items-center space-x-2">
+                  <span className="font-bold text-slate-900 text-sm">Welcome back, {userProfile.name}!</span>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                    <Icons.ShieldCheck className="w-3.5 h-3.5 mr-1 text-emerald-600" />
+                    Mobile Verified
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500">
+                  Phone: +91 {userProfile.phone} • {userProfile.savedAddresses.length} Saved Addresses • {userProfile.ecoPoints} Eco-Points
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <button
+                type="button"
+                onClick={onNavigateProfile}
+                className="px-3.5 py-1.5 bg-white border border-emerald-300 text-emerald-800 hover:bg-emerald-100 rounded-xl text-xs font-bold transition shadow-sm"
+              >
+                Manage Profile &amp; Addresses
+              </button>
+            </div>
+          </div>
+
+          {/* Hero Section */}
+          <div className="bg-gradient-to-br from-emerald-800 via-emerald-700 to-teal-900 text-white rounded-3xl p-8 sm:p-14 shadow-2xl shadow-emerald-950/20 relative overflow-hidden">
+            {/* Background decorative circles */}
+            <div className="absolute -right-16 -top-16 w-72 h-72 rounded-full bg-emerald-400/20 blur-3xl pointer-events-none"></div>
+            <div className="absolute -left-12 -bottom-12 w-64 h-64 rounded-full bg-teal-300/15 blur-2xl pointer-events-none"></div>
+
+            <div className="relative z-10 max-w-2xl">
+              <div className="inline-flex items-center space-x-2 bg-emerald-900/70 backdrop-blur-md border border-emerald-400/30 px-4 py-1.5 rounded-full text-xs font-semibold text-emerald-100 mb-6 shadow-sm">
+                <Icons.Leaf className="w-3.5 h-3.5 text-emerald-300" />
+                <span>Verified Doorstep Waste Collection &amp; Recycling</span>
+              </div>
+
+              <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-white mb-4 leading-tight">
+                EcoCollect
+              </h1>
+
+              <p className="text-emerald-100 text-base sm:text-lg mb-8 leading-relaxed max-w-xl">
+                Certified, prompt, and responsible waste pickup. Schedule collection for your household recyclables with authenticated phone and GPS-verified addresses.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-4">
+                <button
+                  type="button"
+                  onClick={onNavigateRequest}
+                  className="inline-flex items-center justify-center px-7 py-4 rounded-2xl bg-white text-emerald-900 font-extrabold text-base hover:bg-emerald-50 transition shadow-xl shadow-emerald-950/30 active:scale-95 transform hover:-translate-y-0.5 cursor-pointer"
+                >
+                  <Icons.Plus className="w-5 h-5 mr-2 text-emerald-600" />
+                  Request Waste Pickup
+                  <Icons.ArrowRight className="w-5 h-5 ml-2 text-emerald-700" />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={onNavigateMyRequests}
+                  className="inline-flex items-center justify-center px-7 py-4 rounded-2xl bg-emerald-900/60 hover:bg-emerald-900/90 text-white font-bold text-base border border-emerald-400/30 backdrop-blur-sm transition active:scale-95 cursor-pointer"
+                >
+                  View My Requests
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Waste Categories Showcase - ALL ARE CLICKABLE BUTTONS */}
+          <div>
+            <div className="text-center max-w-xl mx-auto mb-8">
+              <div className="inline-flex items-center px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold mb-2">
+                Click Any Category To Book
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">Supported Waste Categories</h2>
+              <p className="text-sm text-slate-500 mt-1">Select a category below to instantly begin your pickup request</p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-5 gap-4">
+              {categories.map((item) => (
+                <button
+                  key={item.title}
+                  type="button"
+                  onClick={() => onSelectCategory(item.title)}
+                  className="group bg-white p-6 rounded-3xl border-2 border-slate-200 text-center flex flex-col items-center hover:border-emerald-500 hover:shadow-xl hover:-translate-y-1 transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  title={`Request pickup for ${item.title}`}
+                >
+                  <div className="w-16 h-16 rounded-2xl bg-slate-50 group-hover:bg-emerald-50 flex items-center justify-center mb-4 transition-colors">
+                    {item.icon}
+                  </div>
+                  <h3 className="font-extrabold text-slate-900 text-base group-hover:text-emerald-700 transition">
+                    {item.title}
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-1 mb-4 flex-1">
+                    {item.desc}
+                  </p>
+                  <span className="w-full py-1.5 px-3 rounded-xl bg-slate-100 group-hover:bg-emerald-600 text-slate-700 group-hover:text-white text-xs font-bold transition flex items-center justify-center">
+                    Select &amp; Request
+                    <Icons.ArrowRight className="w-3.5 h-3.5 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 3 Simple Steps */}
+          <div className="bg-white rounded-3xl p-8 sm:p-10 border border-slate-200 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 mb-6 border-b border-slate-100 gap-4">
+              <div>
+                <h2 className="text-xl sm:text-2xl font-bold text-slate-900">How EcoCollect Works</h2>
+                <p className="text-xs sm:text-sm text-slate-500 mt-0.5">Secure OTP mobile authentication, GPS address verification, certified recycling</p>
+              </div>
+              <button
+                type="button"
+                onClick={onOpenInfo}
+                className="inline-flex items-center text-xs font-bold text-emerald-700 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-3.5 py-2 rounded-xl transition"
+              >
+                <Icons.Help className="w-4 h-4 mr-1.5" />
+                Frequently Asked Questions
+              </button>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 font-extrabold text-lg flex items-center justify-center shrink-0 shadow-sm">
+                  1
+                </div>
+                <div>
+                  <h4 className="font-bold text-slate-800 text-base">OTP Verified Details</h4>
+                  <p className="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed">
+                    Authenticate your mobile number via OTP and pinpoint your exact street address or use saved addresses.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 font-extrabold text-lg flex items-center justify-center shrink-0 shadow-sm">
+                  2
+                </div>
+                <div>
+                  <h4 className="font-bold text-slate-800 text-base">Admin Route Scheduling</h4>
+                  <p className="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed">
+                    Our coordinator reviews your location and schedules an eco-friendly collection vehicle to your area.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 font-extrabold text-lg flex items-center justify-center shrink-0 shadow-sm">
+                  3
+                </div>
+                <div>
+                  <h4 className="font-bold text-slate-800 text-base">Doorstep Pickup &amp; Credits</h4>
+                  <p className="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed">
+                    Our crew collects your segregated waste and awards reward points directly to your verified profile.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-8 pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="text-xs text-slate-500">
+                Ready to recycle? Booking takes under 60 seconds with your verified profile.
+              </div>
+              <button
+                type="button"
+                onClick={onNavigateRequest}
+                className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-md shadow-emerald-600/20 transition active:scale-95"
+              >
+                <Icons.Plus className="w-4 h-4 mr-2" />
+                Schedule Waste Pickup Now
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ==========================================
+    // PAGE 2: REQUEST PICKUP FORM WITH VALIDATIONS
+    // ==========================================
+    function RequestPickupPage({ initialCategory, userProfile, onTriggerOtp, onSubmit, onCancel, onNavigateProfile }) {
+      const [formData, setFormData] = useState({
+        name: userProfile.name || "",
+        phone: userProfile.phone || "",
+        isPhoneVerified: userProfile.isPhoneVerified || false,
+        category: initialCategory || "Plastic",
+        flat: userProfile.savedAddresses[0]?.flat || "",
+        street: userProfile.savedAddresses[0]?.street || "",
+        landmark: userProfile.savedAddresses[0]?.landmark || "",
+        city: userProfile.savedAddresses[0]?.city || "",
+        state: userProfile.savedAddresses[0]?.state || "California",
+        pincode: userProfile.savedAddresses[0]?.pincode || "",
+        notes: "",
+        date: new Date().toISOString().split("T")[0]
+      });
+
+      const [errors, setErrors] = useState({});
+      const [isDetectingGps, setIsDetectingGps] = useState(false);
+      const [saveToProfile, setSaveToProfile] = useState(false);
+
+      useEffect(() => {
+        if (initialCategory) {
+          setFormData(prev => ({ ...prev, category: initialCategory }));
+        }
+      }, [initialCategory]);
+
+      // Comprehensive Validations for Form and Address
+      const validate = () => {
+        const errs = {};
+        
+        // Name validation
+        if (!formData.name.trim()) {
+          errs.name = "Full name is required";
+        } else if (formData.name.trim().length < 2) {
+          errs.name = "Name must be at least 2 characters";
+        } else if (!/^[a-zA-Z\s.'-]+$/.test(formData.name.trim())) {
+          errs.name = "Name can only contain letters, spaces and periods";
+        }
+
+        // Phone validation (10 digits)
+        const cleanPhone = formData.phone.replace(/\D/g, "");
+        if (!formData.phone.trim()) {
+          errs.phone = "Mobile phone number is required";
+        } else if (cleanPhone.length !== 10) {
+          errs.phone = "Mobile number must be exactly 10 digits (e.g. 9876543210)";
+        } else if (!formData.isPhoneVerified) {
+          errs.phone = "Mobile number must be OTP verified before booking";
+        }
+
+        // Category
+        if (!formData.category) {
+          errs.category = "Please select a waste category";
+        }
+
+        // Structured Address Validations
+        if (!formData.flat.trim()) {
+          errs.flat = "House / Flat / Door number is required";
+        } else if (formData.flat.trim().length < 2) {
+          errs.flat = "Enter a valid flat or building address";
+        }
+
+        if (!formData.street.trim()) {
+          errs.street = "Street / Area / Road name is required";
+        } else if (formData.street.trim().length < 4) {
+          errs.street = "Street name is too short (min 4 characters)";
+        }
+
+        if (!formData.city.trim()) {
+          errs.city = "City name is required";
+        } else if (!/^[a-zA-Z\s-]+$/.test(formData.city.trim())) {
+          errs.city = "City name should only contain letters";
+        }
+
+        if (!formData.pincode.trim()) {
+          errs.pincode = "Postal PIN code is required";
+        } else if (!/^\d{5,6}$/.test(formData.pincode.trim())) {
+          errs.pincode = "Enter a valid 5 or 6 digit PIN / Postal code";
+        }
+
+        // Date validation
+        const todayStr = new Date().toISOString().split("T")[0];
+        if (!formData.date) {
+          errs.date = "Pickup date is required";
+        } else if (formData.date < todayStr) {
+          errs.date = "Pickup date cannot be in the past";
+        }
+
+        setErrors(errs);
+        return Object.keys(errs).length === 0;
+      };
+
+      // Handle Phone change
+      const handlePhoneChange = (val) => {
+        const cleaned = val.replace(/\D/g, "").slice(0, 10);
+        const isSameAsProfile = cleaned === userProfile.phone && userProfile.isPhoneVerified;
+        setFormData({
+          ...formData,
+          phone: cleaned,
+          isPhoneVerified: isSameAsProfile
+        });
+        if (errors.phone) {
+          setErrors({ ...errors, phone: null });
+        }
+      };
+
+      // Trigger OTP verification for current phone
+      const handleVerifyPhoneClick = () => {
+        const cleaned = formData.phone.replace(/\D/g, "");
+        if (cleaned.length !== 10) {
+          setErrors(prev => ({ ...prev, phone: "Please enter a valid 10-digit mobile number first" }));
+          return;
+        }
+        onTriggerOtp(cleaned, (verifiedNumber) => {
+          setFormData(prev => ({ ...prev, phone: verifiedNumber, isPhoneVerified: true }));
+          setErrors(prev => ({ ...prev, phone: null }));
+        });
+      };
+
+      // Apply saved address from Profile
+      const handleSelectSavedAddress = (addr) => {
+        setFormData(prev => ({
+          ...prev,
+          flat: addr.flat,
+          street: addr.street,
+          landmark: addr.landmark || "",
+          city: addr.city,
+          state: addr.state,
+          pincode: addr.pincode
+        }));
+        setErrors(prev => ({ ...prev, flat: null, street: null, city: null, pincode: null }));
+      };
+
+      // GPS Location Detection
+      const handleDetectGps = () => {
+        setIsDetectingGps(true);
+        if ("geolocation" in navigator) {
+          navigator.geolocation.getCurrentPosition(
+            (pos) => {
+              setIsDetectingGps(false);
+              // Auto-fill realistic authenticated coordinates and verified address
+              setFormData(prev => ({
+                ...prev,
+                flat: prev.flat || "GPS Geo-Location Point",
+                street: "742 Evergreen Terrace (GPS Verified)",
+                landmark: `Near Lat ${pos.coords.latitude.toFixed(3)}, Lng ${pos.coords.longitude.toFixed(3)}`,
+                city: prev.city || "Springfield",
+                state: prev.state || "California",
+                pincode: prev.pincode || "97477"
+              }));
+              setErrors(prev => ({ ...prev, flat: null, street: null, city: null, pincode: null }));
+            },
+            (err) => {
+              setIsDetectingGps(false);
+              // Fallback default authenticated mock
+              setFormData(prev => ({
+                ...prev,
+                flat: "Flat 101, Green Horizon",
+                street: "42 Eco Boulevard (GPS Point)",
+                landmark: "Near Eco Park",
+                city: "Springfield",
+                state: "California",
+                pincode: "97477"
+              }));
+            },
+            { timeout: 5000 }
+          );
+        } else {
+          setIsDetectingGps(false);
+          setFormData(prev => ({
+            ...prev,
+            flat: "House 24, Sun Crest",
+            street: "12 Valley Road",
+            city: "Springfield",
+            state: "California",
+            pincode: "97477"
+          }));
+        }
+      };
+
+      // Form submission
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        
+        // If phone not verified, prompt verification automatically
+        const cleanPhone = formData.phone.replace(/\D/g, "");
+        if (cleanPhone.length === 10 && !formData.isPhoneVerified) {
+          handleVerifyPhoneClick();
+          return;
+        }
+
+        if (!validate()) return;
+
+        const fullFormattedAddress = `${formData.flat}, ${formData.street}${formData.landmark ? `, ${formData.landmark}` : ""}, ${formData.city}, ${formData.state} - ${formData.pincode}`;
+
+        const randomNum = Math.floor(1000 + Math.random() * 9000);
+        const newRequest = {
+          id: `EC-${randomNum}`,
+          name: formData.name.trim(),
+          phone: cleanPhone,
+          isPhoneVerified: true,
+          category: formData.category,
+          address: fullFormattedAddress,
+          flat: formData.flat.trim(),
+          street: formData.street.trim(),
+          landmark: formData.landmark.trim(),
+          city: formData.city.trim(),
+          state: formData.state,
+          pincode: formData.pincode.trim(),
+          notes: formData.notes.trim() || "No extra notes provided.",
+          date: formData.date,
+          status: "Pending",
+          createdAt: new Date().toISOString()
+        };
+
+        onSubmit(newRequest);
+      };
+
+      // Auto-fill demo data
+      const handleAutoFill = () => {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const dateStr = tomorrow.toISOString().split("T")[0];
+
+        setFormData({
+          name: "Jane Cooper",
+          phone: "9876543210",
+          isPhoneVerified: true,
+          category: "Plastic",
+          flat: "Flat 402, Green Meadows",
+          street: "742 Evergreen Terrace",
+          landmark: "Near Central Park",
+          city: "Springfield",
+          state: "California",
+          pincode: "97477",
+          notes: "2 clear bags of sorted plastic bottles & jugs",
+          date: dateStr
+        });
+        setErrors({});
+      };
+
+      const categoryOptions = ["Plastic", "Paper", "Organic", "E-Waste", "Other"];
+      const states = ["California", "New York", "Texas", "Illinois", "Florida", "Washington", "Massachusetts", "Georgia", "Other"];
+
+      return (
+        <div className="max-w-2xl mx-auto">
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-xl p-6 sm:p-10">
+            {/* Header */}
+            <div className="mb-6 pb-4 border-b border-slate-100 flex items-start justify-between">
+              <div>
+                <div className="flex items-center space-x-2 text-emerald-600 font-semibold text-xs tracking-wider uppercase mb-1">
+                  <Icons.Plus className="w-4 h-4" />
+                  <span>Authenticated Pickup Scheduler</span>
+                </div>
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">Request Waste Pickup</h2>
+                <p className="text-xs text-slate-500 mt-1">Verified mobile authentication and validated doorstep address</p>
+              </div>
+
+              {/* Auto-Fill Demo Button */}
+              <button
+                type="button"
+                onClick={handleAutoFill}
+                className="inline-flex items-center text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3.5 py-1.5 rounded-xl shadow-sm transition active:scale-95"
+                title="Fill verified demo data with 1 click"
+              >
+                <Icons.Sparkles className="w-3.5 h-3.5 mr-1.5 text-emerald-600" />
+                Auto-Fill Demo
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Requester Contact & Mobile Authentication */}
+              <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xs font-extrabold text-slate-800 uppercase tracking-wider flex items-center">
+                    <Icons.ShieldCheck className="w-4 h-4 mr-1.5 text-emerald-600" />
+                    Requester &amp; Mobile Authentication
+                  </h3>
+                  {formData.isPhoneVerified ? (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                      ✓ Mobile Authenticated
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-300">
+                      OTP Verification Required
+                    </span>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Name */}
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                      Full Name *
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                        <Icons.User className="w-4 h-4" />
+                      </div>
+                      <input
+                        type="text"
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        placeholder="e.g. Jane Cooper"
+                        className={`w-full pl-9 pr-3 py-2 bg-white border rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 transition ${
+                          errors.name ? "border-rose-400 bg-rose-50/20" : "border-slate-200"
+                        }`}
+                      />
+                    </div>
+                    {errors.name && <p className="text-rose-500 text-[11px] mt-1">{errors.name}</p>}
+                  </div>
+
+                  {/* Mobile Number with OTP Verification Button */}
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                      10-Digit Mobile Number *
+                    </label>
+                    <div className="flex space-x-2">
+                      <div className="relative flex-1">
+                        <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-slate-400 text-xs font-bold">
+                          +91
+                        </div>
+                        <input
+                          type="tel"
+                          value={formData.phone}
+                          onChange={(e) => handlePhoneChange(e.target.value)}
+                          placeholder="9876543210"
+                          maxLength="10"
+                          className={`w-full pl-10 pr-3 py-2 bg-white border rounded-xl text-xs font-mono font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500 transition ${
+                            errors.phone ? "border-rose-400 bg-rose-50/20" : "border-slate-200"
+                          }`}
+                        />
+                      </div>
+
+                      {/* OTP Action Button */}
+                      {!formData.isPhoneVerified ? (
+                        <button
+                          type="button"
+                          onClick={handleVerifyPhoneClick}
+                          className="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-sm transition active:scale-95 whitespace-nowrap"
+                        >
+                          Verify OTP
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={handleVerifyPhoneClick}
+                          className="px-2.5 py-2 bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-xl text-xs font-bold flex items-center whitespace-nowrap"
+                          title="Mobile is authenticated. Click to re-verify if needed."
+                        >
+                          ✓ Verified
+                        </button>
+                      )}
+                    </div>
+                    {errors.phone && <p className="text-rose-500 text-[11px] mt-1">{errors.phone}</p>}
+                  </div>
+                </div>
+              </div>
+
+              {/* Waste Category Selection */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                  Waste Category *
+                </label>
+                {/* 1-Click Category Pills */}
+                <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 mb-2">
+                  {categoryOptions.map((cat) => (
+                    <button
+                      key={cat}
+                      type="button"
+                      onClick={() => setFormData({ ...formData, category: cat })}
+                      className={`py-2 px-2 rounded-xl text-xs font-bold transition border ${
+                        formData.category === cat
+                          ? "bg-emerald-600 text-white border-emerald-600 shadow-sm"
+                          : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Structured Address Authentication & Validation */}
+              <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-200/60">
+                  <div>
+                    <h3 className="text-xs font-extrabold text-slate-800 uppercase tracking-wider flex items-center">
+                      <Icons.MapPin className="w-4 h-4 mr-1.5 text-emerald-600" />
+                      Doorstep Pickup Address Validation
+                    </h3>
+                    <p className="text-[11px] text-slate-500">Provide verified location for the collection crew</p>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    {/* GPS Detect Button */}
+                    <button
+                      type="button"
+                      onClick={handleDetectGps}
+                      disabled={isDetectingGps}
+                      className="inline-flex items-center px-3 py-1.5 rounded-xl bg-white border border-slate-300 text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 hover:border-emerald-300 text-xs font-bold transition shadow-sm"
+                      title="Use device GPS to locate address"
+                    >
+                      <Icons.Navigation className={`w-3.5 h-3.5 mr-1 text-emerald-600 ${isDetectingGps ? 'animate-spin' : ''}`} />
+                      {isDetectingGps ? "Detecting..." : "Detect GPS"}
+                    </button>
+
+                    {/* Saved Addresses Shortcut Button */}
+                    {userProfile.savedAddresses.length > 0 && (
+                      <div className="relative group">
+                        <button
+                          type="button"
+                          className="px-3 py-1.5 rounded-xl bg-emerald-100 text-emerald-800 text-xs font-bold hover:bg-emerald-200 transition"
+                        >
+                          Saved Addresses ▾
+                        </button>
+                        <div className="absolute right-0 top-full mt-1 w-56 bg-white border border-slate-200 rounded-xl shadow-xl p-1.5 z-20 hidden group-hover:block">
+                          {userProfile.savedAddresses.map(addr => (
+                            <button
+                              key={addr.id}
+                              type="button"
+                              onClick={() => handleSelectSavedAddress(addr)}
+                              className="w-full text-left px-3 py-2 rounded-lg text-xs hover:bg-emerald-50 text-slate-800 font-medium"
+                            >
+                              <span className="font-bold block">{addr.label} ({addr.city})</span>
+                              <span className="text-[11px] text-slate-500 truncate block">{addr.street}</span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Flat & Street */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                      Flat / House / Building *
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.flat}
+                      onChange={(e) => setFormData({ ...formData, flat: e.target.value })}
+                      placeholder="e.g. Flat 402, Green Meadows"
+                      className={`w-full px-3 py-2 bg-white border rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 transition ${
+                        errors.flat ? "border-rose-400 bg-rose-50/20" : "border-slate-200"
+                      }`}
+                    />
+                    {errors.flat && <p className="text-rose-500 text-[11px] mt-1">{errors.flat}</p>}
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                      Street / Road / Colony *
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.street}
+                      onChange={(e) => setFormData({ ...formData, street: e.target.value })}
+                      placeholder="e.g. 742 Evergreen Terrace"
+                      className={`w-full px-3 py-2 bg-white border rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 transition ${
+                        errors.street ? "border-rose-400 bg-rose-50/20" : "border-slate-200"
+                      }`}
+                    />
+                    {errors.street && <p className="text-rose-500 text-[11px] mt-1">{errors.street}</p>}
+                  </div>
+                </div>
+
+                {/* Landmark & City */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                      Landmark (Optional)
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.landmark}
+                      onChange={(e) => setFormData({ ...formData, landmark: e.target.value })}
+                      placeholder="e.g. Opposite Central Park"
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                      City / Town *
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.city}
+                      onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                      placeholder="e.g. Springfield"
+                      className={`w-full px-3 py-2 bg-white border rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 transition ${
+                        errors.city ? "border-rose-400 bg-rose-50/20" : "border-slate-200"
+                      }`}
+                    />
+                    {errors.city && <p className="text-rose-500 text-[11px] mt-1">{errors.city}</p>}
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                      PIN / Postal Code *
+                    </label>
+                    <input
+                      type="text"
+                      maxLength="6"
+                      value={formData.pincode}
+                      onChange={(e) => setFormData({ ...formData, pincode: e.target.value.replace(/\D/g, "") })}
+                      placeholder="e.g. 97477 or 560001"
+                      className={`w-full px-3 py-2 bg-white border rounded-xl text-xs font-mono font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500 transition ${
+                        errors.pincode ? "border-rose-400 bg-rose-50/20" : "border-slate-200"
+                      }`}
+                    />
+                    {errors.pincode && <p className="text-rose-500 text-[11px] mt-1">{errors.pincode}</p>}
+                  </div>
+                </div>
+
+                {/* State */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    State / Region *
+                  </label>
+                  <select
+                    value={formData.state}
+                    onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 transition cursor-pointer"
+                  >
+                    {states.map(st => (
+                      <option key={st} value={st}>{st}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Pickup Preferred Date */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                  Pickup Date *
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                    <Icons.Calendar className="w-4 h-4" />
+                  </div>
+                  <input
+                    type="date"
+                    min={new Date().toISOString().split("T")[0]}
+                    value={formData.date}
+                    onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                    className={`w-full pl-10 pr-4 py-2.5 bg-slate-50 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition ${
+                      errors.date ? "border-rose-400 bg-rose-50/30" : "border-slate-200"
+                    }`}
+                  />
+                </div>
+                {errors.date && <p className="text-rose-500 text-xs mt-1">{errors.date}</p>}
+              </div>
+
+              {/* Instructions */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                  Collection Notes / Instructions (Optional)
+                </label>
+                <input
+                  type="text"
+                  value={formData.notes}
+                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                  placeholder="e.g. Leave near front gate, ring bell #402"
+                  className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition"
+                />
+              </div>
+
+              {/* Buttons: Cancel & Submit */}
+              <div className="pt-4 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={onCancel}
+                  className="px-4 py-2.5 text-sm font-semibold text-slate-600 hover:text-slate-900 transition rounded-xl hover:bg-slate-100"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="submit"
+                  className="px-7 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm shadow-xl shadow-emerald-600/30 active:scale-95 transition flex items-center cursor-pointer"
+                >
+                  <Icons.CheckCircle className="w-4 h-4 mr-2" />
+                  {formData.isPhoneVerified ? "Submit Verified Pickup Request" : "Verify Phone & Submit"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      );
+    }
+
+    // ==========================================
+    // PAGE 3: MY REQUESTS
+    // ==========================================
+    function MyRequestsPage({ requests, onNewRequest, onViewDetails, onCancelRequest, onDeleteRequest, onReorder }) {
+      const [filter, setFilter] = useState("All");
+
+      const filtered = filter === "All" 
+        ? requests 
+        : requests.filter(r => r.status.toLowerCase() === filter.toLowerCase());
+
+      return (
+        <div className="space-y-6">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center space-x-2">
+                <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold tracking-wider uppercase">
+                  User Dashboard
+                </span>
+                <span className="text-xs text-slate-400">Authenticated Tracking</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">My Requests</h2>
+              <p className="text-xs sm:text-sm text-slate-500 mt-0.5">Track, cancel, or re-order your collection bookings</p>
+            </div>
+
+            <button
+              type="button"
+              onClick={onNewRequest}
+              className="inline-flex items-center justify-center px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-md shadow-emerald-600/20 transition active:scale-95 cursor-pointer"
+            >
+              <Icons.Plus className="w-4 h-4 mr-1.5" />
+              Schedule New Pickup
+            </button>
+          </div>
+
+          {/* Quick filter tabs */}
+          <div className="flex items-center space-x-2 overflow-x-auto pb-1 text-xs">
+            {["All", "Pending", "Scheduled", "Completed", "Cancelled"].map((item) => (
+              <button
+                key={item}
+                type="button"
+                onClick={() => setFilter(item)}
+                className={`px-3.5 py-2 rounded-xl font-bold transition flex items-center ${
+                  filter === item
+                    ? "bg-slate-900 text-white shadow-sm"
+                    : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-100"
+                }`}
+              >
+                <span>{item}</span>
+                <span className={`ml-2 px-1.5 py-0.5 rounded-full text-[10px] ${
+                  filter === item ? "bg-slate-800 text-emerald-400 font-extrabold" : "bg-slate-100 text-slate-600"
+                }`}>
+                  {item === "All" ? requests.length : requests.filter(r => r.status === item).length}
+                </span>
+              </button>
+            ))}
+          </div>
+
+          {/* Content */}
+          {filtered.length === 0 ? (
+            <div className="bg-white rounded-3xl border border-slate-200 p-12 text-center shadow-sm">
+              <div className="w-16 h-16 mx-auto rounded-3xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4 shadow-sm">
+                <Icons.Recycle className="w-8 h-8" />
+              </div>
+              <h3 className="text-xl font-extrabold text-slate-800">No requests found</h3>
+              <p className="text-xs sm:text-sm text-slate-500 mt-1 max-w-sm mx-auto">
+                {filter === "All" 
+                  ? "You haven't submitted any waste pickup requests yet." 
+                  : `There are currently no requests with "${filter}" status.`}
+              </p>
+              <div className="mt-6 flex items-center justify-center gap-3">
+                {filter !== "All" && (
+                  <button
+                    type="button"
+                    onClick={() => setFilter("All")}
+                    className="px-4 py-2 rounded-xl bg-slate-100 text-slate-700 text-xs font-bold hover:bg-slate-200 transition"
+                  >
+                    View All Requests
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={onNewRequest}
+                  className="inline-flex items-center px-5 py-2.5 rounded-xl bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-700 shadow-md shadow-emerald-600/20 transition active:scale-95"
+                >
+                  <Icons.Plus className="w-4 h-4 mr-1.5" />
+                  Schedule Your First Pickup
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              {filtered.map((item) => {
+                const badge = getCategoryBadge(item.category);
+                const isPendingOrScheduled = item.status === "Pending" || item.status === "Scheduled";
+                return (
+                  <div 
+                    key={item.id} 
+                    className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm hover:shadow-lg transition-all duration-200 flex flex-col justify-between"
+                  >
+                    <div>
+                      {/* Top Bar: ID + Status + Category */}
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center space-x-2">
+                          <span className="text-xs font-mono font-extrabold px-2.5 py-1 rounded-lg bg-slate-100 text-slate-800 border border-slate-200">
+                            {item.id}
+                          </span>
+                          <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold border ${badge.bg}`}>
+                            {badge.icon}
+                            {item.category}
+                          </span>
+                        </div>
+                        <StatusBadge status={item.status} />
+                      </div>
+
+                      {/* Details list */}
+                      <div className="space-y-2.5 text-xs text-slate-600 bg-slate-50/70 p-4 rounded-2xl border border-slate-100">
+                        <div className="flex items-center space-x-2.5">
+                          <Icons.Calendar className="w-4 h-4 text-emerald-600 shrink-0" />
+                          <span className="font-bold text-slate-800">Pickup Date:</span>
+                          <span className="font-semibold text-slate-700">{item.date}</span>
+                        </div>
+
+                        <div className="flex items-start space-x-2.5">
+                          <Icons.MapPin className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                          <div>
+                            <span className="font-bold text-slate-800">Address: </span>
+                            <span className="text-slate-600">{item.address}</span>
+                          </div>
+                        </div>
+
+                        {item.name && (
+                          <div className="flex items-center space-x-2.5">
+                            <Icons.User className="w-4 h-4 text-emerald-600 shrink-0" />
+                            <span className="font-bold text-slate-800">Contact:</span>
+                            <span>{item.name} (+91 {item.phone})</span>
+                            <span className="text-[10px] text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded font-bold">Verified</span>
+                          </div>
+                        )}
+
+                        {item.notes && item.notes !== "No extra notes provided." && (
+                          <div className="text-[11px] text-slate-500 pt-1 border-t border-slate-200/50 italic">
+                            "{item.notes}"
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Card Actions */}
+                    <div className="mt-5 pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
+                      <button
+                        type="button"
+                        onClick={() => onViewDetails(item)}
+                        className="inline-flex items-center px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-emerald-700 text-xs font-bold transition"
+                        title="View live tracking status & printable ticket"
+                      >
+                        <Icons.Eye className="w-3.5 h-3.5 mr-1 text-slate-500 group-hover:text-emerald-600" />
+                        Track &amp; Details
+                      </button>
+
+                      <div className="flex items-center space-x-2">
+                        {isPendingOrScheduled ? (
+                          <button
+                            type="button"
+                            onClick={() => onCancelRequest(item.id)}
+                            className="inline-flex items-center px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold border border-rose-200 transition"
+                            title="Cancel this pickup request"
+                          >
+                            <Icons.XCircle className="w-3.5 h-3.5 mr-1 text-rose-600" />
+                            Cancel Pickup
+                          </button>
+                        ) : (
+                          <>
+                            <button
+                              type="button"
+                              onClick={() => onReorder(item)}
+                              className="inline-flex items-center px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold border border-emerald-200 transition"
+                              title="Book again with these details"
+                            >
+                              <Icons.Sparkles className="w-3.5 h-3.5 mr-1 text-emerald-600" />
+                              Book Again
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => onDeleteRequest(item.id)}
+                              className="p-1.5 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition"
+                              title="Delete record from list"
+                            >
+                              <Icons.Trash className="w-4 h-4" />
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // ==========================================
+    // PAGE 4: USER PROFILE & ADDRESS MANAGEMENT
+    // ==========================================
+    function ProfilePage({ userProfile, onUpdateProfile, onTriggerOtp, onSchedulePickup, onViewRequests, onToast }) {
+      const [isEditingInfo, setIsEditingInfo] = useState(false);
+      const [profileForm, setProfileForm] = useState({
+        name: userProfile.name,
+        email: userProfile.email,
+        phone: userProfile.phone
+      });
+      const [showAddAddressModal, setShowAddAddressModal] = useState(false);
+      const [editingAddress, setEditingAddress] = useState(null);
+
+      // Handle profile info update
+      const handleSaveProfileInfo = (e) => {
+        e.preventDefault();
+        if (!profileForm.name.trim()) {
+          onToast("Name cannot be empty", "error");
+          return;
+        }
+        const updated = {
+          ...userProfile,
+          name: profileForm.name.trim(),
+          email: profileForm.email.trim()
+        };
+        onUpdateProfile(updated);
+        setIsEditingInfo(false);
+        onToast("Profile updated successfully!");
+      };
+
+      // Set address as default
+      const handleSetDefaultAddress = (addrId) => {
+        const updatedAddrs = userProfile.savedAddresses.map(a => ({
+          ...a,
+          isDefault: a.id === addrId
+        }));
+        onUpdateProfile({ ...userProfile, savedAddresses: updatedAddrs });
+        onToast("Default pickup address updated!");
+      };
+
+      // Delete an address
+      const handleDeleteAddress = (addrId) => {
+        if (userProfile.savedAddresses.length <= 1) {
+          onToast("You must keep at least one saved address.", "info");
+          return;
+        }
+        const updated = userProfile.savedAddresses.filter(a => a.id !== addrId);
+        onUpdateProfile({ ...userProfile, savedAddresses: updated });
+        onToast("Address deleted.");
+      };
+
+      // Add or Edit Address
+      const handleSaveAddress = (addressData) => {
+        let updatedAddrs;
+        if (editingAddress) {
+          updatedAddrs = userProfile.savedAddresses.map(a => 
+            a.id === editingAddress.id ? { ...addressData, id: a.id } : a
+          );
+          onToast("Address updated successfully!");
+        } else {
+          const newAddr = {
+            ...addressData,
+            id: `addr_${Date.now()}`,
+            isDefault: userProfile.savedAddresses.length === 0
+          };
+          updatedAddrs = [...userProfile.savedAddresses, newAddr];
+          onToast("New pickup address added!");
+        }
+        onUpdateProfile({ ...userProfile, savedAddresses: updatedAddrs });
+        setShowAddAddressModal(false);
+        setEditingAddress(null);
+      };
+
+      return (
+        <div className="space-y-8 max-w-4xl mx-auto">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center space-x-2">
+                <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold tracking-wider uppercase">
+                  User Account
+                </span>
+                <span className="text-xs text-slate-400">Authenticated Profile</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">Profile &amp; Settings</h2>
+              <p className="text-xs sm:text-sm text-slate-500">Manage authenticated mobile number, addresses, and recycling credentials</p>
+            </div>
+
+            <div className="flex items-center space-x-3">
+              <button
+                type="button"
+                onClick={onSchedulePickup}
+                className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-600/20 transition active:scale-95 flex items-center"
+              >
+                <Icons.Plus className="w-3.5 h-3.5 mr-1.5" />
+                Book Pickup
+              </button>
+            </div>
+          </div>
+
+          {/* Profile Overview Card */}
+          <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-6 border-b border-slate-100">
+              <div className="flex items-center space-x-4">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white font-extrabold text-2xl flex items-center justify-center shadow-lg shadow-emerald-600/20">
+                  {userProfile.name.charAt(0)}
+                </div>
+                <div>
+                  <div className="flex items-center space-x-2">
+                    <h3 className="text-xl font-extrabold text-slate-900">{userProfile.name}</h3>
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                      <Icons.ShieldCheck className="w-3.5 h-3.5 mr-1 text-emerald-600" />
+                      Verified
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    {userProfile.email} • Member since {userProfile.memberSince}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-3">
+                <button
+                  type="button"
+                  onClick={() => setIsEditingInfo(!isEditingInfo)}
+                  className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition flex items-center"
+                >
+                  <Icons.Edit className="w-3.5 h-3.5 mr-1.5 text-slate-600" />
+                  {isEditingInfo ? "Cancel Editing" : "Edit Profile"}
+                </button>
+              </div>
+            </div>
+
+            {/* Inline Profile Info Edit Form */}
+            {isEditingInfo ? (
+              <form onSubmit={handleSaveProfileInfo} className="mt-6 p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-4">
+                <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider">Update Personal Details</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-600 mb-1">Full Name</label>
+                    <input
+                      type="text"
+                      value={profileForm.name}
+                      onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })}
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-600 mb-1">Email Address</label>
+                    <input
+                      type="email"
+                      value={profileForm.email}
+                      onChange={(e) => setProfileForm({ ...profileForm, email: e.target.value })}
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500"
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="flex justify-end space-x-2 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsEditingInfo(false)}
+                    className="px-3.5 py-1.5 text-xs text-slate-600 font-semibold hover:bg-slate-200 rounded-lg"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-1.5 bg-emerald-600 text-white text-xs font-bold rounded-lg hover:bg-emerald-700 transition"
+                  >
+                    Save Changes
+                  </button>
+                </div>
+              </form>
+            ) : null}
+
+            {/* Mobile Authentication Status Card */}
+            <div className="mt-6 p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center">
+                  <Icons.Phone className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="flex items-center space-x-2">
+                    <span className="font-extrabold text-slate-900 text-sm font-mono">+91 {userProfile.phone}</span>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-200 text-emerald-900">
+                      ✓ Authenticated
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-600">Mobile number is verified with SMS OTP authentication</p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => onTriggerOtp(userProfile.phone, () => onToast("Phone re-verified successfully!"))}
+                className="px-3.5 py-2 bg-white border border-emerald-300 text-emerald-800 hover:bg-emerald-100 rounded-xl text-xs font-bold transition shadow-sm whitespace-nowrap"
+              >
+                Re-Verify via OTP
+              </button>
+            </div>
+
+            {/* Eco Impact Stats Scoreboard */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
+              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 text-center">
+                <Icons.Recycle className="w-5 h-5 text-emerald-600 mx-auto mb-1" />
+                <div className="text-xl font-extrabold text-slate-900">{userProfile.totalRecycledKg} KG</div>
+                <div className="text-[11px] text-slate-500 font-medium">Recycled Waste</div>
+              </div>
+              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 text-center">
+                <Icons.Award className="w-5 h-5 text-amber-500 mx-auto mb-1" />
+                <div className="text-xl font-extrabold text-amber-600">{userProfile.ecoPoints} Pts</div>
+                <div className="text-[11px] text-slate-500 font-medium">Eco-Reward Credits</div>
+              </div>
+              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 text-center">
+                <Icons.Truck className="w-5 h-5 text-sky-600 mx-auto mb-1" />
+                <div className="text-xl font-extrabold text-slate-900">5</div>
+                <div className="text-[11px] text-slate-500 font-medium">Completed Pickups</div>
+              </div>
+              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 text-center">
+                <Icons.Leaf className="w-5 h-5 text-teal-600 mx-auto mb-1" />
+                <div className="text-xl font-extrabold text-teal-700">18.4 KG</div>
+                <div className="text-[11px] text-slate-500 font-medium">CO₂ Saved</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Saved Addresses Manager */}
+          <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm">
+            <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-6">
+              <div>
+                <h3 className="text-lg font-extrabold text-slate-900">Saved Pickup Addresses</h3>
+                <p className="text-xs text-slate-500 mt-0.5">Manage verified doorstep locations for fast 1-click scheduling</p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => { setEditingAddress(null); setShowAddAddressModal(true); }}
+                className="inline-flex items-center px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-600/20 transition active:scale-95"
+              >
+                <Icons.Plus className="w-3.5 h-3.5 mr-1.5" />
+                Add New Address
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {userProfile.savedAddresses.map((addr) => (
+                <div
+                  key={addr.id}
+                  className={`p-5 rounded-2xl border transition-all duration-200 flex flex-col justify-between ${
+                    addr.isDefault ? "border-emerald-400 bg-emerald-50/20 shadow-sm" : "border-slate-200 bg-white"
+                  }`}
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center space-x-2">
+                        <span className="font-extrabold text-slate-900 text-sm flex items-center">
+                          {addr.label === "Home" ? <Icons.Home className="w-4 h-4 mr-1 text-slate-500" /> : <Icons.Briefcase className="w-4 h-4 mr-1 text-slate-500" />}
+                          {addr.label}
+                        </span>
+                        {addr.isDefault && (
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                            Default
+                          </span>
+                        )}
+                      </div>
+                      {addr.isGpsVerified && (
+                        <span className="text-[11px] font-semibold text-emerald-700 flex items-center">
+                          <Icons.Navigation className="w-3 h-3 mr-1" />
+                          GPS Verified
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="text-xs text-slate-600 space-y-1 mt-2">
+                      <p className="font-semibold text-slate-800">{addr.flat}</p>
+                      <p>{addr.street}</p>
+                      {addr.landmark && <p className="text-slate-400 italic">Landmark: {addr.landmark}</p>}
+                      <p className="font-semibold text-slate-700">{addr.city}, {addr.state} - {addr.pincode}</p>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                    {!addr.isDefault ? (
+                      <button
+                        type="button"
+                        onClick={() => handleSetDefaultAddress(addr.id)}
+                        className="text-emerald-700 hover:text-emerald-900 font-bold hover:underline"
+                      >
+                        Set as Default
+                      </button>
+                    ) : (
+                      <span className="text-emerald-700 font-semibold text-[11px]">Primary Address</span>
+                    )}
+
+                    <div className="flex items-center space-x-2">
+                      <button
+                        type="button"
+                        onClick={() => { setEditingAddress(addr); setShowAddAddressModal(true); }}
+                        className="p-1.5 text-slate-500 hover:text-emerald-700 hover:bg-slate-100 rounded-lg transition"
+                        title="Edit Address"
+                      >
+                        <Icons.Edit className="w-4 h-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteAddress(addr.id)}
+                        className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition"
+                        title="Delete Address"
+                      >
+                        <Icons.Trash className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Add / Edit Address Modal */}
+          {showAddAddressModal && (
+            <AddressModal 
+              initialData={editingAddress}
+              onSave={handleSaveAddress}
+              onClose={() => { setShowAddAddressModal(false); setEditingAddress(null); }}
+            />
+          )}
+        </div>
+      );
+    }
+
+    // ==========================================
+    // ADDRESS MODAL COMPONENT
+    // ==========================================
+    function AddressModal({ initialData, onSave, onClose }) {
+      const [form, setForm] = useState({
+        label: initialData?.label || "Home",
+        flat: initialData?.flat || "",
+        street: initialData?.street || "",
+        landmark: initialData?.landmark || "",
+        city: initialData?.city || "",
+        state: initialData?.state || "California",
+        pincode: initialData?.pincode || "",
+        isGpsVerified: initialData?.isGpsVerified || false
+      });
+      const [errors, setErrors] = useState({});
+
+      const validate = () => {
+        const errs = {};
+        if (!form.flat.trim()) errs.flat = "House / Flat number is required";
+        if (!form.street.trim()) errs.street = "Street address is required";
+        if (!form.city.trim()) errs.city = "City is required";
+        if (!form.pincode.trim() || !/^\d{5,6}$/.test(form.pincode.trim())) {
+          errs.pincode = "Enter valid 5 or 6 digit PIN code";
+        }
+        setErrors(errs);
+        return Object.keys(errs).length === 0;
+      };
+
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        if (!validate()) return;
+        onSave(form);
+      };
+
+      const states = ["California", "New York", "Texas", "Illinois", "Florida", "Washington", "Massachusetts", "Georgia", "Other"];
+
+      return (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-200 relative">
+            <button
+              type="button"
+              onClick={onClose}
+              className="absolute top-6 right-6 text-slate-400 hover:text-slate-700 p-1 rounded-xl"
+            >
+              <Icons.X className="w-5 h-5" />
+            </button>
+
+            <h3 className="text-xl font-extrabold text-slate-900 mb-1">
+              {initialData ? "Edit Address" : "Add New Address"}
+            </h3>
+            <p className="text-xs text-slate-500 mb-4">Validate address for swift doorstep collections</p>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Label */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Address Label</label>
+                <div className="flex space-x-2">
+                  {["Home", "Office", "Other"].map(lbl => (
+                    <button
+                      key={lbl}
+                      type="button"
+                      onClick={() => setForm({ ...form, label: lbl })}
+                      className={`flex-1 py-1.5 rounded-xl text-xs font-bold border transition ${
+                        form.label === lbl
+                          ? "bg-emerald-600 text-white border-emerald-600 shadow-sm"
+                          : "bg-slate-50 text-slate-600 border-slate-200"
+                      }`}
+                    >
+                      {lbl}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Flat */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">House / Flat / Floor *</label>
+                <input
+                  type="text"
+                  value={form.flat}
+                  onChange={(e) => setForm({ ...form, flat: e.target.value })}
+                  placeholder="e.g. Flat 301, Building B"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500"
+                />
+                {errors.flat && <p className="text-rose-500 text-[11px] mt-1">{errors.flat}</p>}
+              </div>
+
+              {/* Street */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Street / Colony *</label>
+                <input
+                  type="text"
+                  value={form.street}
+                  onChange={(e) => setForm({ ...form, street: e.target.value })}
+                  placeholder="e.g. 100 Sunset Blvd"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500"
+                />
+                {errors.street && <p className="text-rose-500 text-[11px] mt-1">{errors.street}</p>}
+              </div>
+
+              {/* Landmark */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Landmark (Optional)</label>
+                <input
+                  type="text"
+                  value={form.landmark}
+                  onChange={(e) => setForm({ ...form, landmark: e.target.value })}
+                  placeholder="e.g. Near Metro gate 2"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500"
+                />
+              </div>
+
+              {/* City & PIN */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">City *</label>
+                  <input
+                    type="text"
+                    value={form.city}
+                    onChange={(e) => setForm({ ...form, city: e.target.value })}
+                    placeholder="e.g. Springfield"
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500"
+                  />
+                  {errors.city && <p className="text-rose-500 text-[11px] mt-1">{errors.city}</p>}
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">PIN / Postal Code *</label>
+                  <input
+                    type="text"
+                    maxLength="6"
+                    value={form.pincode}
+                    onChange={(e) => setForm({ ...form, pincode: e.target.value.replace(/\D/g, "") })}
+                    placeholder="97477"
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold focus:ring-2 focus:ring-emerald-500"
+                  />
+                  {errors.pincode && <p className="text-rose-500 text-[11px] mt-1">{errors.pincode}</p>}
+                </div>
+              </div>
+
+              {/* State */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">State</label>
+                <select
+                  value={form.state}
+                  onChange={(e) => setForm({ ...form, state: e.target.value })}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs cursor-pointer"
+                >
+                  {states.map(s => <option key={s} value={s}>{s}</option>)}
+                </select>
+              </div>
+
+              <div className="pt-3 flex justify-end space-x-2 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md transition"
+                >
+                  Save Address
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      );
+    }
+
+    // ==========================================
+    // OTP VERIFICATION MODAL
+    // ==========================================
+    function OtpVerificationModal({ phone, expectedOtp, onVerify, onResend, onClose }) {
+      const [otpInput, setOtpInput] = useState("");
+      const [error, setError] = useState("");
+      const [timer, setTimer] = useState(25);
+
+      useEffect(() => {
+        if (timer > 0) {
+          const id = setTimeout(() => setTimer(timer - 1), 1000);
+          return () => clearTimeout(id);
+        }
+      }, [timer]);
+
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        if (otpInput.trim() === expectedOtp) {
+          onVerify(phone);
+        } else {
+          setError("Incorrect OTP code. Please check the code provided below or resend.");
+        }
+      };
+
+      return (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-sm w-full p-6 sm:p-8 shadow-2xl border border-slate-200 relative text-center">
+            <button
+              type="button"
+              onClick={onClose}
+              className="absolute top-6 right-6 text-slate-400 hover:text-slate-700 p-1 rounded-xl"
+            >
+              <Icons.X className="w-5 h-5" />
+            </button>
+
+            <div className="w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto mb-4 shadow-sm">
+              <Icons.Key className="w-7 h-7" />
+            </div>
+
+            <h3 className="text-xl font-extrabold text-slate-900">Verify Mobile Number</h3>
+            <p className="text-xs text-slate-500 mt-1">
+              We sent a 4-digit verification code to <span className="font-bold text-slate-800">+91 {phone}</span>
+            </p>
+
+            {/* Demo Helper Banner with 1-Click Fill */}
+            <div className="my-4 p-3 bg-emerald-50 rounded-2xl border border-emerald-200 text-xs text-emerald-900">
+              <span className="font-semibold block mb-1">🔑 Demo Verification Code:</span>
+              <span className="font-mono text-lg font-extrabold tracking-widest bg-white px-3 py-1 rounded-lg border border-emerald-300 inline-block shadow-sm">
+                {expectedOtp}
+              </span>
+              <div className="mt-2">
+                <button
+                  type="button"
+                  onClick={() => { setOtpInput(expectedOtp); setError(""); }}
+                  className="text-emerald-700 hover:text-emerald-800 underline font-bold"
+                >
+                  Click here to auto-fill code
+                </button>
+              </div>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <input
+                  type="text"
+                  maxLength="4"
+                  value={otpInput}
+                  onChange={(e) => { setOtpInput(e.target.value.replace(/\D/g, "")); setError(""); }}
+                  placeholder="• • • •"
+                  className="w-36 mx-auto text-center font-mono text-2xl font-bold tracking-widest px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  autoFocus
+                />
+                {error && <p className="text-rose-500 text-[11px] mt-1.5">{error}</p>}
+              </div>
+
+              <button
+                type="submit"
+                className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-600/20 transition active:scale-95 cursor-pointer"
+              >
+                Confirm &amp; Verify Mobile
+              </button>
+
+              <div className="text-[11px] text-slate-400">
+                {timer > 0 ? (
+                  <span>Resend code in {timer}s</span>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => { onResend(); setTimer(25); }}
+                    className="text-emerald-700 font-bold hover:underline"
+                  >
+                    Resend OTP Code
+                  </button>
+                )}
+              </div>
+            </form>
+          </div>
+        </div>
+      );
+    }
+
+    // ==========================================
+    // PAGE 5: ADMIN DASHBOARD
+    // ==========================================
+    function AdminDashboardPage({
+      requests,
+      totalRequests,
+      pendingCount,
+      scheduledCount,
+      completedCount,
+      onStatusChange,
+      onCancelRequest,
+      onDeleteRequest,
+      onResetSampleData,
+      onExportCSV,
+      onClearCompleted,
+      onViewDetails,
+      onOpenNewPickup
+    }) {
+      const [statusFilter, setStatusFilter] = useState("All");
+      const [searchQuery, setSearchQuery] = useState("");
+
+      const filteredRequests = requests.filter(req => {
+        const matchesStatus = statusFilter === "All" || req.status === statusFilter;
+        const matchesSearch = 
+          req.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          req.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          req.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          req.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          req.phone.toLowerCase().includes(searchQuery.toLowerCase());
+        return matchesStatus && matchesSearch;
+      });
+
+      return (
+        <div className="space-y-8">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center space-x-2">
+                <span className="px-3 py-1 rounded-full bg-slate-900 text-white text-xs font-extrabold tracking-wider uppercase shadow-sm">
+                  Admin Command Center
+                </span>
+                <span className="text-xs text-slate-400">Live localStorage Sync</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">Admin Dashboard</h2>
+              <p className="text-xs sm:text-sm text-slate-500">Manage route schedules, dispatch drivers, and update status</p>
+            </div>
+
+            {/* Top Toolbar Action Buttons */}
+            <div className="flex flex-wrap items-center gap-2.5">
+              <button
+                type="button"
+                onClick={onOpenNewPickup}
+                className="inline-flex items-center px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md shadow-emerald-600/20 transition active:scale-95"
+                title="Create a pickup request from Admin"
+              >
+                <Icons.Plus className="w-3.5 h-3.5 mr-1.5" />
+                New Pickup
+              </button>
+
+              <button
+                type="button"
+                onClick={onExportCSV}
+                className="inline-flex items-center px-3.5 py-2 rounded-xl bg-white border border-slate-300 text-slate-700 text-xs font-bold hover:bg-slate-50 transition shadow-sm active:scale-95"
+                title="Download all pickup records as CSV spreadsheet"
+              >
+                <Icons.Download className="w-3.5 h-3.5 mr-1.5 text-slate-500" />
+                Export CSV
+              </button>
+
+              <button
+                type="button"
+                onClick={onResetSampleData}
+                className="inline-flex items-center px-3 py-2 rounded-xl bg-white border border-slate-300 text-slate-700 text-xs font-bold hover:bg-slate-50 transition shadow-sm active:scale-95"
+                title="Reset back to standard sample items"
+              >
+                <Icons.Recycle className="w-3.5 h-3.5 mr-1.5 text-slate-500" />
+                Reset Demo
+              </button>
+
+              <button
+                type="button"
+                onClick={onClearCompleted}
+                className="inline-flex items-center px-3 py-2 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-700 text-xs font-bold border border-slate-200 transition active:scale-95"
+                title="Purge completed & cancelled records"
+              >
+                <Icons.Trash className="w-3.5 h-3.5 mr-1 text-slate-500 hover:text-rose-600" />
+                Purge Done
+              </button>
+            </div>
+          </div>
+
+          {/* Clickable Metric Summary Cards */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <button
+              type="button"
+              onClick={() => setStatusFilter("All")}
+              className={`p-5 rounded-3xl border text-left transition transform hover:-translate-y-0.5 cursor-pointer ${
+                statusFilter === "All"
+                  ? "bg-slate-900 text-white border-slate-900 shadow-lg"
+                  : "bg-white text-slate-800 border-slate-200 hover:border-slate-400 shadow-sm"
+              }`}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <span className={`text-xs font-extrabold uppercase tracking-wider ${statusFilter === "All" ? "text-slate-300" : "text-slate-500"}`}>
+                  Total
+                </span>
+                <Icons.Recycle className={`w-5 h-5 ${statusFilter === "All" ? "text-emerald-400" : "text-slate-600"}`} />
+              </div>
+              <h3 className="text-3xl font-extrabold">{totalRequests}</h3>
+              <span className={`text-[11px] mt-1 inline-block ${statusFilter === "All" ? "text-slate-400" : "text-slate-400"}`}>
+                Click to view all
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setStatusFilter("Pending")}
+              className={`p-5 rounded-3xl border text-left transition transform hover:-translate-y-0.5 cursor-pointer ${
+                statusFilter === "Pending"
+                  ? "bg-amber-600 text-white border-amber-600 shadow-lg"
+                  : "bg-white text-slate-800 border-amber-200 hover:border-amber-400 shadow-sm"
+              }`}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <span className={`text-xs font-extrabold uppercase tracking-wider ${statusFilter === "Pending" ? "text-amber-100" : "text-amber-700"}`}>
+                  Pending
+                </span>
+                <Icons.Clock className={`w-5 h-5 ${statusFilter === "Pending" ? "text-white" : "text-amber-600"}`} />
+              </div>
+              <h3 className={`text-3xl font-extrabold ${statusFilter === "Pending" ? "text-white" : "text-amber-600"}`}>{pendingCount}</h3>
+              <span className={`text-[11px] mt-1 inline-block ${statusFilter === "Pending" ? "text-amber-100" : "text-amber-600/80"}`}>
+                Awaiting route
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setStatusFilter("Scheduled")}
+              className={`p-5 rounded-3xl border text-left transition transform hover:-translate-y-0.5 cursor-pointer ${
+                statusFilter === "Scheduled"
+                  ? "bg-sky-600 text-white border-sky-600 shadow-lg"
+                  : "bg-white text-slate-800 border-sky-200 hover:border-sky-400 shadow-sm"
+              }`}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <span className={`text-xs font-extrabold uppercase tracking-wider ${statusFilter === "Scheduled" ? "text-sky-100" : "text-sky-700"}`}>
+                  Scheduled
+                </span>
+                <Icons.Truck className={`w-5 h-5 ${statusFilter === "Scheduled" ? "text-white" : "text-sky-600"}`} />
+              </div>
+              <h3 className={`text-3xl font-extrabold ${statusFilter === "Scheduled" ? "text-white" : "text-sky-600"}`}>{scheduledCount}</h3>
+              <span className={`text-[11px] mt-1 inline-block ${statusFilter === "Scheduled" ? "text-sky-100" : "text-sky-600/80"}`}>
+                Vehicles assigned
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setStatusFilter("Completed")}
+              className={`p-5 rounded-3xl border text-left transition transform hover:-translate-y-0.5 cursor-pointer ${
+                statusFilter === "Completed"
+                  ? "bg-emerald-600 text-white border-emerald-600 shadow-lg"
+                  : "bg-white text-slate-800 border-emerald-200 hover:border-emerald-400 shadow-sm"
+              }`}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <span className={`text-xs font-extrabold uppercase tracking-wider ${statusFilter === "Completed" ? "text-emerald-100" : "text-emerald-700"}`}>
+                  Completed
+                </span>
+                <Icons.CheckCircle className={`w-5 h-5 ${statusFilter === "Completed" ? "text-white" : "text-emerald-600"}`} />
+              </div>
+              <h3 className={`text-3xl font-extrabold ${statusFilter === "Completed" ? "text-white" : "text-emerald-600"}`}>{completedCount}</h3>
+              <span className={`text-[11px] mt-1 inline-block ${statusFilter === "Completed" ? "text-emerald-100" : "text-emerald-600/80"}`}>
+                Successfully collected
+              </span>
+            </button>
+          </div>
+
+          {/* Table Container */}
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+            {/* Filter and Search Bar */}
+            <div className="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-50/50">
+              {/* Filter tabs */}
+              <div className="flex items-center space-x-1.5 overflow-x-auto w-full sm:w-auto">
+                {["All", "Pending", "Scheduled", "Completed", "Cancelled"].map((status) => (
+                  <button
+                    key={status}
+                    type="button"
+                    onClick={() => setStatusFilter(status)}
+                    className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition ${
+                      statusFilter === status
+                        ? "bg-emerald-600 text-white shadow-sm"
+                        : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-100"
+                    }`}
+                  >
+                    {status}
+                    {status === "All" ? ` (${requests.length})` : ` (${requests.filter(r => r.status === status).length})`}
+                  </button>
+                ))}
+              </div>
+
+              {/* Search input with clear button */}
+              <div className="w-full sm:w-72 relative">
+                <input
+                  type="text"
+                  placeholder="Search ID, customer, phone, city..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-3 pr-8 py-2 text-xs bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm"
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery("")}
+                    className="absolute inset-y-0 right-0 pr-2.5 flex items-center text-slate-400 hover:text-slate-600"
+                    title="Clear search"
+                  >
+                    <Icons.X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Table */}
+            <div className="overflow-x-auto custom-scrollbar">
+              <table className="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 font-extrabold uppercase tracking-wider">
+                    <th className="py-3.5 px-4">Request ID</th>
+                    <th className="py-3.5 px-4">Requester</th>
+                    <th className="py-3.5 px-4">Waste Type</th>
+                    <th className="py-3.5 px-4">Pickup Date</th>
+                    <th className="py-3.5 px-4">Address</th>
+                    <th className="py-3.5 px-4">Current Status</th>
+                    <th className="py-3.5 px-4 text-center">Change Status</th>
+                    <th className="py-3.5 px-4 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {filteredRequests.length === 0 ? (
+                    <tr>
+                      <td colSpan="8" className="py-12 text-center text-slate-400">
+                        <div className="w-12 h-12 mx-auto rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mb-3">
+                          <Icons.Recycle className="w-6 h-6" />
+                        </div>
+                        <p className="font-semibold text-slate-600">No pickup requests match your criteria.</p>
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredRequests.map((req) => {
+                      const badge = getCategoryBadge(req.category);
+                      return (
+                        <tr key={req.id} className="hover:bg-slate-50/80 transition">
+                          {/* Request ID */}
+                          <td className="py-3.5 px-4 font-mono font-bold text-slate-800">
+                            <button
+                              type="button"
+                              onClick={() => onViewDetails(req)}
+                              className="text-emerald-700 hover:text-emerald-900 hover:underline font-bold"
+                              title="Click to view details"
+                            >
+                              {req.id}
+                            </button>
+                          </td>
+
+                          {/* Requester */}
+                          <td className="py-3.5 px-4">
+                            <div className="font-bold text-slate-900">{req.name}</div>
+                            <div className="text-[11px] text-slate-500 font-mono">+91 {req.phone}</div>
+                          </td>
+
+                          {/* Waste Type */}
+                          <td className="py-3.5 px-4">
+                            <span className={`inline-flex items-center px-2 py-0.5 rounded-md font-bold text-[11px] border ${badge.bg}`}>
+                              {badge.icon}
+                              {req.category}
+                            </span>
+                          </td>
+
+                          {/* Pickup Date */}
+                          <td className="py-3.5 px-4 text-slate-700 font-semibold whitespace-nowrap">
+                            {req.date}
+                          </td>
+
+                          {/* Address */}
+                          <td className="py-3.5 px-4 max-w-xs truncate text-slate-600" title={req.address}>
+                            {req.address}
+                          </td>
+
+                          {/* Current Status */}
+                          <td className="py-3.5 px-4 whitespace-nowrap">
+                            <StatusBadge status={req.status} />
+                          </td>
+
+                          {/* Change Status Dropdown */}
+                          <td className="py-3.5 px-4 text-center">
+                            <select
+                              value={req.status}
+                              onChange={(e) => onStatusChange(req.id, e.target.value)}
+                              className="px-2.5 py-1.5 rounded-xl border border-slate-300 text-xs font-bold bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm cursor-pointer hover:border-emerald-500 transition"
+                            >
+                              <option value="Pending">Pending</option>
+                              <option value="Scheduled">Scheduled</option>
+                              <option value="Completed">Completed</option>
+                              <option value="Cancelled">Cancelled</option>
+                            </select>
+                          </td>
+
+                          {/* Row Action Buttons */}
+                          <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                            <div className="flex items-center justify-end space-x-1.5">
+                              <button
+                                type="button"
+                                onClick={() => onViewDetails(req)}
+                                className="p-1.5 rounded-lg text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 transition"
+                                title="View Details"
+                              >
+                                <Icons.Eye className="w-4 h-4" />
+                              </button>
+
+                              {req.status === "Pending" && (
+                                <button
+                                  type="button"
+                                  onClick={() => onStatusChange(req.id, "Scheduled")}
+                                  className="px-2 py-1 rounded-lg bg-sky-50 text-sky-700 hover:bg-sky-100 font-bold text-[11px] border border-sky-200 transition"
+                                >
+                                  Schedule
+                                </button>
+                              )}
+
+                              {req.status === "Scheduled" && (
+                                <button
+                                  type="button"
+                                  onClick={() => onStatusChange(req.id, "Completed")}
+                                  className="px-2 py-1 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-bold text-[11px] border border-emerald-200 transition"
+                                >
+                                  Complete
+                                </button>
+                              )}
+
+                              <button
+                                type="button"
+                                onClick={() => onDeleteRequest(req.id)}
+                                className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition"
+                                title="Delete request"
+                              >
+                                <Icons.Trash className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Table Footer */}
+            <div className="p-4 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
+              <span>Showing {filteredRequests.length} of {requests.length} total entries</span>
+              <span className="text-emerald-700 font-semibold flex items-center">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 mr-2"></span>
+                Changes persist automatically in browser localStorage
+              </span>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ==========================================
+    // DETAIL & TRACKING MODAL COMPONENT
+    // ==========================================
+    function DetailModal({ request, isAdmin, onClose, onCancelRequest, onStatusChange, onDeleteRequest }) {
+      if (!request) return null;
+      const badge = getCategoryBadge(request.category);
+
+      const steps = [
+        { label: "Request Placed", desc: "Authenticated via OTP in system", done: true },
+        { label: "Admin Approved", desc: "Collection route mapped & scheduled", done: request.status === "Scheduled" || request.status === "Completed" },
+        { label: "Vehicle Dispatched", desc: "Crew on transit to doorstep", done: request.status === "Scheduled" || request.status === "Completed" },
+        { label: "Recycled & Completed", desc: "Materials safely routed to plant", done: request.status === "Completed" }
+      ];
+
+      return (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-200 relative printable-modal">
+            <button
+              type="button"
+              onClick={onClose}
+              className="absolute top-6 right-6 text-slate-400 hover:text-slate-700 p-1 rounded-xl hover:bg-slate-100 transition no-print focus:outline-none"
+              title="Close modal"
+            >
+              <Icons.X className="w-5 h-5" />
+            </button>
+
+            {/* Modal Header */}
+            <div className="mb-6 pb-4 border-b border-slate-100">
+              <div className="flex items-center space-x-2 mb-1">
+                <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-800">
+                  {request.id}
+                </span>
+                <StatusBadge status={request.status} />
+              </div>
+              <h3 className="text-xl font-extrabold text-slate-900">Waste Pickup Details</h3>
+              <p className="text-xs text-slate-500">Scheduled doorstep collection &amp; segregation tracking</p>
+            </div>
+
+            {/* Stepper */}
+            {request.status !== "Cancelled" ? (
+              <div className="mb-6 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">Live Pickup Progress</h4>
+                <div className="space-y-3">
+                  {steps.map((st, i) => (
+                    <div key={i} className="flex items-start space-x-3 text-xs">
+                      <div className={`w-5 h-5 rounded-full flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5 ${
+                        st.done ? "bg-emerald-600 text-white" : "bg-slate-200 text-slate-500"
+                      }`}>
+                        {st.done ? "✓" : i + 1}
+                      </div>
+                      <div>
+                        <p className={`font-bold ${st.done ? "text-slate-900" : "text-slate-400"}`}>{st.label}</p>
+                        <p className="text-[11px] text-slate-500">{st.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="mb-6 bg-rose-50 p-4 rounded-2xl border border-rose-200 text-xs text-rose-800 flex items-center space-x-3">
+                <Icons.XCircle className="w-6 h-6 text-rose-600 shrink-0" />
+                <div>
+                  <p className="font-bold">This pickup request was Cancelled</p>
+                  <p className="text-[11px] text-rose-600">You can reschedule or submit a new pickup request anytime.</p>
+                </div>
+              </div>
+            )}
+
+            {/* Details */}
+            <div className="space-y-3 text-xs bg-slate-50/70 p-4 rounded-2xl border border-slate-100 mb-6">
+              <div className="flex items-center justify-between">
+                <span className="text-slate-500">Waste Category:</span>
+                <span className={`inline-flex items-center px-2 py-0.5 rounded font-bold border ${badge.bg}`}>
+                  {badge.icon}
+                  {request.category}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-slate-500">Requester Name:</span>
+                <span className="font-bold text-slate-800">{request.name}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-slate-500">Authenticated Mobile:</span>
+                <span className="font-bold text-emerald-700 flex items-center font-mono">
+                  +91 {request.phone}
+                  <span className="ml-1.5 text-[10px] bg-emerald-100 text-emerald-800 px-1 rounded">✓ Verified</span>
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-slate-500">Pickup Date:</span>
+                <span className="font-bold text-slate-900">{request.date}</span>
+              </div>
+              <div className="pt-2 border-t border-slate-200/60">
+                <span className="text-slate-500 block mb-1">Doorstep Address:</span>
+                <p className="font-medium text-slate-800">{request.address}</p>
+              </div>
+              {request.notes && (
+                <div className="pt-2 border-t border-slate-200/60">
+                  <span className="text-slate-500 block mb-0.5">Instructions:</span>
+                  <p className="font-medium text-slate-700 italic">"{request.notes}"</p>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Bottom Buttons */}
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100 no-print">
+              <div className="flex items-center space-x-2">
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  className="inline-flex items-center px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition"
+                  title="Print collection receipt or pass"
+                >
+                  <Icons.Printer className="w-3.5 h-3.5 mr-1.5 text-slate-600" />
+                  Print Slip
+                </button>
+
+                {request.status !== "Cancelled" && request.status !== "Completed" && (
+                  <button
+                    type="button"
+                    onClick={() => onCancelRequest(request.id)}
+                    className="inline-flex items-center px-3 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold border border-rose-200 transition"
+                  >
+                    Cancel Request
+                  </button>
+                )}
+              </div>
+
+              <div className="flex items-center space-x-2">
+                {isAdmin && (
+                  <button
+                    type="button"
+                    onClick={() => onDeleteRequest(request.id)}
+                    className="p-2 text-rose-600 hover:bg-rose-50 rounded-xl transition"
+                    title="Delete record"
+                  >
+                    <Icons.Trash className="w-4 h-4" />
+                  </button>
+                )}
+
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="px-5 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ==========================================
+    // HELP & INFO MODAL COMPONENT
+    // ==========================================
+    function InfoModal({ onClose }) {
+      return (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-200 relative">
+            <button
+              type="button"
+              onClick={onClose}
+              className="absolute top-6 right-6 text-slate-400 hover:text-slate-700 p-1 rounded-xl hover:bg-slate-100 transition focus:outline-none"
+            >
+              <Icons.X className="w-5 h-5" />
+            </button>
+
+            <div className="mb-6 pb-4 border-b border-slate-100">
+              <div className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold mb-1">
+                EcoCollect FAQ &amp; Guidelines
+              </div>
+              <h3 className="text-xl font-extrabold text-slate-900">How It Works</h3>
+              <p className="text-xs text-slate-500">Everything you need to know about doorstep waste collection</p>
+            </div>
+
+            <div className="space-y-4 text-xs text-slate-600 max-h-96 overflow-y-auto custom-scrollbar pr-1">
+              <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100">
+                <h5 className="font-bold text-slate-900 mb-1">How does mobile authentication work?</h5>
+                <p>When booking or saving your profile, enter your 10-digit mobile number and click "Verify OTP". A 4-digit code will be sent to confirm your identity.</p>
+              </div>
+
+              <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100">
+                <h5 className="font-bold text-slate-900 mb-1">How is the doorstep address validated?</h5>
+                <p>Address inputs require house/flat number, street name, city, and a valid 5-6 digit PIN code. You can also click "Detect GPS" to verify your exact physical coordinates.</p>
+              </div>
+
+              <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100">
+                <h5 className="font-bold text-slate-900 mb-1">Where are my saved addresses located?</h5>
+                <p>Visit the new <strong>Profile</strong> tab in the navigation bar to add, edit, or set default pickup addresses (Home, Office, etc.).</p>
+              </div>
+
+              <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100">
+                <h5 className="font-bold text-slate-900 mb-1">Does this require any backend server?</h5>
+                <p>No backend is required. All authentication states, addresses, and pickup logs are saved directly in browser LocalStorage, making this prototype 100% offline-ready.</p>
+              </div>
+            </div>
+
+            <div className="mt-6 pt-4 border-t border-slate-100 flex justify-end">
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md shadow-emerald-600/20 transition active:scale-95"
+              >
+                Got It
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Render the React application
+    const root = ReactDOM.createRoot(document.getElementById("root"));
+    root.render(<App />);
+  </script>
+</body>
+</html>

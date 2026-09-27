@@ -11,6 +11,18 @@ No installation, build step, or Node.js required!
 1. **Directly open** [`index.html`](file:///c:/Users/Noora%20Excellence/Documents/dhiraj%20hackathon/index.html) in any browser (Chrome, Edge, Firefox, Brave, Safari).
 2. Alternatively, double-click [`start-app.bat`](file:///c:/Users/Noora%20Excellence/Documents/dhiraj%20hackathon/start-app.bat).
 
+## 🎨 Visual Aesthetics & Micro-Animations
+
+- **Glassmorphism Design**: Frosted glass panels (`backdrop-blur-xl bg-white/88 border border-white/60`) and subtle multi-point radial gradient background mesh.
+- **Micro-Animations & Keyframes**:
+  - `animate-fadeInUp`: Smooth staggered page-level entrance on tab switches.
+  - `animate-popIn`: Bouncy entrance for modals and dialogs.
+  - `animate-float`: Ambient slow floating orbs and icons.
+  - `btn-shimmer`: Light sweep shine effect on primary action buttons.
+  - `animate-celebrate`: Confetti celebration overlay with animated floating eco-badges upon verified bookings and OTP verification.
+- **Card Hover Physics**: 3D lift with category-specific colored glowing drop shadows (blue, amber, emerald, purple, teal).
+- **Modern Typography**: Google Fonts (`Plus Jakarta Sans` and `Inter`) for clean, crisp readability.
+
 ---
 
 ## 🌟 Features Overview

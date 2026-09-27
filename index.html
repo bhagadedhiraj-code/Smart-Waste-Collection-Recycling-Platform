@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>EcoCollect - Waste Collection Request Portal</title>
+  <title>EcoCollect - Smart Waste Collection & Recycling Portal</title>
   
   <!-- Tailwind CSS with Local and CDN fallback -->
   <script src="vendor/tailwind.js"></script>
@@ -58,10 +58,122 @@
   </script>
 
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+    
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #f8fafc;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.08) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(20, 184, 166, 0.08) 0px, transparent 50%),
+        radial-gradient(at 50% 100%, rgba(59, 130, 246, 0.05) 0px, transparent 50%);
+      background-attachment: fixed;
     }
+
+    /* Keyframe Animations */
+    @keyframes floatSlow {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-12px) rotate(2deg); }
+    }
+
+    @keyframes floatReverse {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(12px) rotate(-2deg); }
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 15px rgba(16, 185, 129, 0.2); }
+      50% { box-shadow: 0 0 30px rgba(16, 185, 129, 0.45); }
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes popIn {
+      0% { opacity: 0; transform: scale(0.93); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes shimmerSweep {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(200%); }
+    }
+
+    @keyframes spinSlow {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes celebrateBurst {
+      0% { transform: scale(0.5); opacity: 0; }
+      50% { transform: scale(1.15); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    /* Utility Animation Classes */
+    .animate-fadeInUp {
+      animation: fadeInUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .animate-popIn {
+      animation: popIn 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .animate-float {
+      animation: floatSlow 5s ease-in-out infinite;
+    }
+
+    .animate-float-delay {
+      animation: floatSlow 6s ease-in-out 1.5s infinite;
+    }
+
+    .animate-float-reverse {
+      animation: floatReverse 5.5s ease-in-out infinite;
+    }
+
+    .animate-spin-slow {
+      animation: spinSlow 20s linear infinite;
+    }
+
+    .animate-celebrate {
+      animation: celebrateBurst 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+    }
+
+    .glass-header {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    /* Shimmer effect on buttons */
+    .btn-shimmer {
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-shimmer::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(60deg, transparent, rgba(255, 255, 255, 0.28), transparent);
+      transform: translateX(-100%);
+      transition: transform 0.6s ease;
+    }
+    .btn-shimmer:hover::after {
+      transform: translateX(100%);
+    }
+
     .custom-scrollbar::-webkit-scrollbar {
       width: 6px;
       height: 6px;
@@ -76,6 +188,7 @@
     .custom-scrollbar::-webkit-scrollbar-thumb:hover {
       background: #94a3b8;
     }
+
     @media print {
       header, footer, nav, button, .no-print {
         display: none !important;
@@ -90,7 +203,7 @@
     }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
+<body class="text-slate-800 antialiased min-h-screen flex flex-col selection:bg-emerald-500 selection:text-white">
   <div id="root"></div>
 
   <script type="text/babel">
@@ -424,12 +537,6 @@
           <polygon points="3 11 22 2 13 21 11 13 3 11" />
         </svg>
       ),
-      Lock: (props) => (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className || "w-4 h-4"}>
-          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-        </svg>
-      ),
       Key: (props) => (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className || "w-4 h-4"}>
           <path d="m21 2-2 2m-1.5 1.5L12 11l4 4 3-3m-1.5-1.5L20 8m-2-2-4 4" />
@@ -462,73 +569,109 @@
       )
     };
 
-    // Category styling helper
+    // Category styling helper with animation shadow styles
     const getCategoryBadge = (category) => {
       switch (category) {
         case "Plastic":
           return {
             bg: "bg-blue-50 text-blue-700 border-blue-200",
+            glow: "hover:border-blue-400 hover:shadow-blue-500/20",
             icon: <Icons.Plastic className="w-4 h-4 mr-1 text-blue-600" />
           };
         case "Paper":
           return {
             bg: "bg-amber-50 text-amber-700 border-amber-200",
+            glow: "hover:border-amber-400 hover:shadow-amber-500/20",
             icon: <Icons.Paper className="w-4 h-4 mr-1 text-amber-600" />
           };
         case "Organic":
           return {
             bg: "bg-emerald-50 text-emerald-700 border-emerald-200",
+            glow: "hover:border-emerald-400 hover:shadow-emerald-500/20",
             icon: <Icons.Leaf className="w-4 h-4 mr-1 text-emerald-600" />
           };
         case "E-Waste":
           return {
             bg: "bg-purple-50 text-purple-700 border-purple-200",
+            glow: "hover:border-purple-400 hover:shadow-purple-500/20",
             icon: <Icons.EWaste className="w-4 h-4 mr-1 text-purple-600" />
           };
         default:
           return {
-            bg: "bg-slate-100 text-slate-700 border-slate-200",
-            icon: <Icons.Other className="w-4 h-4 mr-1 text-slate-600" />
+            bg: "bg-teal-50 text-teal-700 border-teal-200",
+            glow: "hover:border-teal-400 hover:shadow-teal-500/20",
+            icon: <Icons.Other className="w-4 h-4 mr-1 text-teal-600" />
           };
       }
     };
 
-    // Status badge component
+    // Status badge component with pulse on pending
     const StatusBadge = ({ status }) => {
       let config = {
         bg: "bg-slate-100 text-slate-700 border-slate-200",
-        icon: null
+        icon: null,
+        dotColor: "bg-slate-400"
       };
 
       if (status === "Pending") {
         config = {
-          bg: "bg-amber-100 text-amber-800 border-amber-300",
-          icon: <Icons.Clock className="w-3.5 h-3.5 mr-1 text-amber-600" />
+          bg: "bg-amber-100/80 text-amber-800 border-amber-300",
+          icon: <Icons.Clock className="w-3.5 h-3.5 mr-1 text-amber-600" />,
+          dotColor: "bg-amber-500"
         };
       } else if (status === "Scheduled") {
         config = {
-          bg: "bg-sky-100 text-sky-800 border-sky-300",
-          icon: <Icons.Calendar className="w-3.5 h-3.5 mr-1 text-sky-600" />
+          bg: "bg-sky-100/80 text-sky-800 border-sky-300",
+          icon: <Icons.Calendar className="w-3.5 h-3.5 mr-1 text-sky-600" />,
+          dotColor: "bg-sky-500"
         };
       } else if (status === "Completed") {
         config = {
-          bg: "bg-emerald-100 text-emerald-800 border-emerald-300",
-          icon: <Icons.CheckCircle className="w-3.5 h-3.5 mr-1 text-emerald-600" />
+          bg: "bg-emerald-100/80 text-emerald-800 border-emerald-300",
+          icon: <Icons.CheckCircle className="w-3.5 h-3.5 mr-1 text-emerald-600" />,
+          dotColor: "bg-emerald-500"
         };
       } else if (status === "Cancelled") {
         config = {
-          bg: "bg-rose-100 text-rose-800 border-rose-300",
-          icon: <Icons.XCircle className="w-3.5 h-3.5 mr-1 text-rose-600" />
+          bg: "bg-rose-100/80 text-rose-800 border-rose-300",
+          icon: <Icons.XCircle className="w-3.5 h-3.5 mr-1 text-rose-600" />,
+          dotColor: "bg-rose-500"
         };
       }
 
       return (
-        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border ${config.bg}`}>
+        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border ${config.bg} shadow-sm transition-all duration-200`}>
+          <span className={`w-2 h-2 rounded-full ${config.dotColor} mr-1.5 ${status === 'Pending' || status === 'Scheduled' ? 'animate-ping' : ''}`}></span>
           {config.icon}
           {status}
         </span>
       );
     };
+
+    // Confetti Celebration Overlay
+    function CelebrationOverlay({ onDismiss }) {
+      useEffect(() => {
+        const timer = setTimeout(onDismiss, 3500);
+        return () => clearTimeout(timer);
+      }, [onDismiss]);
+
+      return (
+        <div className="fixed inset-0 pointer-events-none z-50 flex items-center justify-center overflow-hidden">
+          <div className="absolute inset-0 bg-emerald-500/10 backdrop-blur-[2px] animate-pulse"></div>
+          <div className="bg-white/95 backdrop-blur-md px-8 py-6 rounded-3xl shadow-2xl border border-emerald-200 text-center animate-celebrate relative">
+            <div className="text-5xl mb-2 animate-bounce">🎉</div>
+            <h3 className="text-xl font-extrabold text-slate-900">Awesome! Action Completed!</h3>
+            <p className="text-xs text-slate-500 mt-1">Your pickup request is registered with eco-rewards!</p>
+            <div className="mt-3 flex justify-center space-x-2 text-2xl">
+              <span className="animate-float">🌿</span>
+              <span className="animate-float-delay">✨</span>
+              <span className="animate-float-reverse">📦</span>
+              <span className="animate-float">♻️</span>
+            </div>
+          </div>
+        </div>
+      );
+    }
 
     // ==========================================
     // MAIN APP COMPONENT
@@ -542,10 +685,10 @@
       const [activeModalRequest, setActiveModalRequest] = useState(null);
       const [showInfoModal, setShowInfoModal] = useState(false);
       const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-      const [otpModalState, setOtpModalState] = useState(null); // { phone, callback, currentOtp }
-      const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(true);
+      const [otpModalState, setOtpModalState] = useState(null);
+      const [showCelebration, setShowCelebration] = useState(false);
 
-      // Load initial data from localStorage
+      // Load initial data
       useEffect(() => {
         try {
           const savedRequests = localStorage.getItem("ecocollect_requests");
@@ -563,7 +706,7 @@
             localStorage.setItem("ecocollect_user_profile", JSON.stringify(INITIAL_USER_PROFILE));
           }
         } catch (e) {
-          console.error("Failed to load data from localStorage", e);
+          console.error("Failed to load data", e);
           setRequests(INITIAL_SAMPLE_DATA);
         }
       }, []);
@@ -598,10 +741,10 @@
       const handleResetSampleData = () => {
         updateRequests(INITIAL_SAMPLE_DATA);
         updateUserProfile(INITIAL_USER_PROFILE);
-        showToast("Restored demo sample data and user profile successfully!");
+        showToast("Restored demo sample data & user profile!");
       };
 
-      // Start Phone OTP Authentication
+      // Trigger OTP verification
       const triggerOtpVerification = (phone, onSuccess) => {
         const generatedCode = Math.floor(1000 + Math.random() * 9000).toString();
         setOtpModalState({
@@ -613,13 +756,13 @@
 
       // Handle successful OTP verification
       const handleOtpSuccess = (verifiedPhone) => {
-        // Update user profile phone verification
         const updated = {
           ...userProfile,
           phone: verifiedPhone,
           isPhoneVerified: true
         };
         updateUserProfile(updated);
+        setShowCelebration(true);
         showToast(`Mobile number +91 ${verifiedPhone} verified successfully!`);
         if (otpModalState && otpModalState.callback) {
           otpModalState.callback(verifiedPhone);
@@ -627,12 +770,11 @@
         setOtpModalState(null);
       };
 
-      // Add new request
+      // Create new request
       const handleCreateRequest = (newRequest) => {
         const updated = [newRequest, ...requests];
         updateRequests(updated);
 
-        // Update profile eco stats
         const updatedProfile = {
           ...userProfile,
           ecoPoints: userProfile.ecoPoints + 50,
@@ -640,6 +782,7 @@
         };
         updateUserProfile(updatedProfile);
 
+        setShowCelebration(true);
         showToast(`Request ${newRequest.id} submitted! +50 Eco-Points earned!`);
         setCurrentPage("my-requests");
       };
@@ -687,14 +830,14 @@
         }
       };
 
-      // Re-order / clone a previous request
+      // Re-order past pickup
       const handleReorder = (oldRequest) => {
         setSelectedCategory(oldRequest.category || "Plastic");
         setCurrentPage("request");
         showToast(`Prefilled form with details from ${oldRequest.id}!`);
       };
 
-      // Export all requests as CSV
+      // Export CSV
       const handleExportCSV = () => {
         if (requests.length === 0) {
           showToast("No requests available to export.", "info");
@@ -725,7 +868,7 @@
         showToast("CSV report downloaded successfully!");
       };
 
-      // Clear completed/cancelled items
+      // Clear completed/cancelled
       const handleClearCompleted = () => {
         const remaining = requests.filter(r => r.status !== "Completed" && r.status !== "Cancelled");
         if (remaining.length === requests.length) {
@@ -737,14 +880,12 @@
         showToast("Cleaned up archived requests successfully.");
       };
 
-      // Navigation with category selector from homepage
       const handleSelectCategoryAndNavigate = (categoryName) => {
         setSelectedCategory(categoryName);
         setCurrentPage("request");
         showToast(`Category "${categoryName}" selected for pickup!`);
       };
 
-      // Calculate stats for Admin
       const totalRequests = requests.length;
       const pendingCount = requests.filter(r => r.status === "Pending").length;
       const scheduledCount = requests.filter(r => r.status === "Scheduled").length;
@@ -752,26 +893,26 @@
 
       return (
         <div className="flex flex-col min-h-screen">
-          {/* Top Navigation Bar */}
-          <header className="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm no-print">
+          {/* Top Glassmorphic Navigation Bar */}
+          <header className="glass-header border-b border-slate-200/80 sticky top-0 z-40 shadow-sm no-print transition-all duration-300">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="flex items-center justify-between h-16">
+              <div className="flex items-center justify-between h-16 sm:h-20">
                 
-                {/* Logo Button */}
+                {/* Logo with Animated Recycle Glow */}
                 <button 
                   type="button"
-                  className="flex items-center space-x-3 group text-left focus:outline-none"
+                  className="flex items-center space-x-3.5 group text-left focus:outline-none"
                   onClick={() => { setCurrentPage("home"); setMobileMenuOpen(false); }}
                   title="Go to EcoCollect Home"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-md shadow-emerald-200 group-hover:bg-emerald-700 transition transform group-hover:scale-105">
-                    <Icons.Recycle className="w-6 h-6" />
+                  <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center shadow-lg shadow-emerald-500/25 group-hover:shadow-emerald-500/40 group-hover:scale-105 transition-all duration-300">
+                    <Icons.Recycle className="w-6 h-6 group-hover:rotate-180 transition-transform duration-700 ease-in-out" />
                   </div>
                   <div>
-                    <span className="text-xl font-extrabold tracking-tight text-slate-900 group-hover:text-emerald-700 transition">
-                      Eco<span className="text-emerald-600">Collect</span>
+                    <span className="text-2xl font-extrabold tracking-tight text-slate-900 group-hover:text-emerald-700 transition">
+                      Eco<span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-500">Collect</span>
                     </span>
-                    <span className="hidden sm:block text-xs text-slate-500 font-medium">Doorstep Recycling Portal</span>
+                    <span className="hidden sm:block text-[11px] text-slate-500 font-semibold tracking-wide uppercase">Smart Recycling Portal</span>
                   </div>
                 </button>
 
@@ -780,10 +921,10 @@
                   <button
                     type="button"
                     onClick={() => setCurrentPage("home")}
-                    className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition ${
+                    className={`px-4 py-2.5 rounded-2xl text-sm font-bold transition-all duration-200 ${
                       currentPage === "home"
-                        ? "bg-emerald-50 text-emerald-700 shadow-sm"
-                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                        ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/30 scale-105"
+                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80"
                     }`}
                   >
                     Home
@@ -792,28 +933,28 @@
                   <button
                     type="button"
                     onClick={() => setCurrentPage("request")}
-                    className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition flex items-center ${
+                    className={`px-4 py-2.5 rounded-2xl text-sm font-bold transition-all duration-200 flex items-center ${
                       currentPage === "request"
-                        ? "bg-emerald-50 text-emerald-700 shadow-sm"
-                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                        ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/30 scale-105"
+                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80"
                     }`}
                   >
-                    <Icons.Plus className="w-4 h-4 mr-1 text-emerald-600" />
+                    <Icons.Plus className="w-4 h-4 mr-1 text-emerald-500 group-hover:rotate-90 transition-transform" />
                     Request Pickup
                   </button>
 
                   <button
                     type="button"
                     onClick={() => setCurrentPage("my-requests")}
-                    className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition flex items-center relative ${
+                    className={`px-4 py-2.5 rounded-2xl text-sm font-bold transition-all duration-200 flex items-center relative ${
                       currentPage === "my-requests"
-                        ? "bg-emerald-50 text-emerald-700 shadow-sm"
-                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                        ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/30 scale-105"
+                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80"
                     }`}
                   >
                     My Requests
                     {requests.length > 0 && (
-                      <span className="ml-1.5 px-2 py-0.5 text-xs rounded-full bg-emerald-100 text-emerald-800 font-bold">
+                      <span className="ml-2 px-2 py-0.5 text-xs rounded-full bg-emerald-100 text-emerald-800 font-extrabold animate-pulse">
                         {requests.length}
                       </span>
                     )}
@@ -823,30 +964,30 @@
                   <button
                     type="button"
                     onClick={() => setCurrentPage("profile")}
-                    className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition flex items-center ${
+                    className={`px-4 py-2.5 rounded-2xl text-sm font-bold transition-all duration-200 flex items-center ${
                       currentPage === "profile"
-                        ? "bg-emerald-50 text-emerald-700 shadow-sm"
-                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                        ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/30 scale-105"
+                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80"
                     }`}
                   >
-                    <div className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 font-extrabold text-[10px] flex items-center justify-center mr-1.5 border border-emerald-300">
+                    <div className="w-6 h-6 rounded-full bg-emerald-200 text-emerald-900 font-extrabold text-xs flex items-center justify-center mr-1.5 border border-emerald-400">
                       {userProfile.name.charAt(0)}
                     </div>
                     <span>Profile</span>
                     {userProfile.isPhoneVerified && (
-                      <span className="ml-1 text-emerald-600 font-extrabold text-xs" title="Verified Mobile Number">✓</span>
+                      <span className="ml-1.5 text-emerald-500 font-extrabold text-xs" title="Verified Mobile Number">✓</span>
                     )}
                   </button>
 
-                  <div className="h-5 w-px bg-slate-200 mx-1"></div>
+                  <div className="h-6 w-px bg-slate-200 mx-1.5"></div>
 
                   {/* Admin Portal Button */}
                   <button
                     type="button"
                     onClick={() => setCurrentPage("admin")}
-                    className={`px-4 py-2 rounded-xl text-sm font-semibold transition flex items-center ${
+                    className={`px-4 py-2 rounded-2xl text-sm font-bold transition-all duration-200 flex items-center ${
                       currentPage === "admin"
-                        ? "bg-slate-900 text-white shadow-md shadow-slate-900/20"
+                        ? "bg-slate-900 text-white shadow-lg shadow-slate-900/30 scale-105"
                         : "text-slate-700 hover:bg-slate-100 border border-slate-200"
                     }`}
                   >
@@ -855,12 +996,12 @@
                   </button>
                 </nav>
 
-                {/* Mobile Hamburger Button */}
+                {/* Mobile Menu Toggle Button */}
                 <div className="md:hidden flex items-center space-x-2">
                   <button
                     type="button"
                     onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                    className="p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 focus:outline-none"
+                    className="p-2.5 rounded-2xl text-slate-700 hover:text-slate-900 hover:bg-slate-100/80 focus:outline-none transition"
                     aria-label="Toggle Navigation Menu"
                   >
                     {mobileMenuOpen ? <Icons.X className="w-6 h-6" /> : <Icons.Menu className="w-6 h-6" />}
@@ -871,12 +1012,12 @@
 
             {/* Mobile Dropdown Menu */}
             {mobileMenuOpen && (
-              <div className="md:hidden border-t border-slate-200 bg-white px-4 pt-2 pb-4 space-y-1 shadow-lg">
+              <div className="md:hidden border-t border-slate-200 bg-white/95 backdrop-blur-md px-4 pt-3 pb-5 space-y-1.5 shadow-xl animate-fadeInUp">
                 <button
                   type="button"
                   onClick={() => { setCurrentPage("home"); setMobileMenuOpen(false); }}
-                  className={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold ${
-                    currentPage === "home" ? "bg-emerald-50 text-emerald-700" : "text-slate-700 hover:bg-slate-50"
+                  className={`w-full text-left px-4 py-3 rounded-2xl text-sm font-bold ${
+                    currentPage === "home" ? "bg-emerald-600 text-white" : "text-slate-700 hover:bg-slate-50"
                   }`}
                 >
                   Home
@@ -884,39 +1025,39 @@
                 <button
                   type="button"
                   onClick={() => { setCurrentPage("request"); setMobileMenuOpen(false); }}
-                  className={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold flex items-center ${
-                    currentPage === "request" ? "bg-emerald-50 text-emerald-700" : "text-slate-700 hover:bg-slate-50"
+                  className={`w-full text-left px-4 py-3 rounded-2xl text-sm font-bold flex items-center ${
+                    currentPage === "request" ? "bg-emerald-600 text-white" : "text-slate-700 hover:bg-slate-50"
                   }`}
                 >
-                  <Icons.Plus className="w-4 h-4 mr-2 text-emerald-600" />
+                  <Icons.Plus className="w-4 h-4 mr-2" />
                   Request Pickup
                 </button>
                 <button
                   type="button"
                   onClick={() => { setCurrentPage("my-requests"); setMobileMenuOpen(false); }}
-                  className={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold flex items-center justify-between ${
-                    currentPage === "my-requests" ? "bg-emerald-50 text-emerald-700" : "text-slate-700 hover:bg-slate-50"
+                  className={`w-full text-left px-4 py-3 rounded-2xl text-sm font-bold flex items-center justify-between ${
+                    currentPage === "my-requests" ? "bg-emerald-600 text-white" : "text-slate-700 hover:bg-slate-50"
                   }`}
                 >
                   <span>My Requests</span>
-                  <span className="px-2 py-0.5 text-xs rounded-full bg-emerald-100 text-emerald-800 font-bold">
+                  <span className="px-2 py-0.5 text-xs rounded-full bg-emerald-100 text-emerald-800 font-extrabold">
                     {requests.length}
                   </span>
                 </button>
                 <button
                   type="button"
                   onClick={() => { setCurrentPage("profile"); setMobileMenuOpen(false); }}
-                  className={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold flex items-center ${
-                    currentPage === "profile" ? "bg-emerald-50 text-emerald-700" : "text-slate-700 hover:bg-slate-50"
+                  className={`w-full text-left px-4 py-3 rounded-2xl text-sm font-bold flex items-center ${
+                    currentPage === "profile" ? "bg-emerald-600 text-white" : "text-slate-700 hover:bg-slate-50"
                   }`}
                 >
-                  <Icons.User className="w-4 h-4 mr-2 text-emerald-600" />
+                  <Icons.User className="w-4 h-4 mr-2" />
                   User Profile ({userProfile.name})
                 </button>
                 <button
                   type="button"
                   onClick={() => { setCurrentPage("admin"); setMobileMenuOpen(false); }}
-                  className={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold flex items-center ${
+                  className={`w-full text-left px-4 py-3 rounded-2xl text-sm font-bold flex items-center ${
                     currentPage === "admin" ? "bg-slate-900 text-white" : "text-slate-700 hover:bg-slate-50"
                   }`}
                 >
@@ -927,87 +1068,94 @@
             )}
           </header>
 
+          {/* Celebration Burst Modal */}
+          {showCelebration && (
+            <CelebrationOverlay onDismiss={() => setShowCelebration(false)} />
+          )}
+
           {/* Toast Notification with Dismiss button */}
           {toast && (
-            <div className="fixed bottom-5 right-5 z-50 animate-bounce no-print">
-              <div className="bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-2xl flex items-center space-x-3 border border-slate-700">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span className="text-sm font-medium">{toast.message}</span>
+            <div className="fixed bottom-6 right-6 z-50 animate-popIn no-print">
+              <div className="bg-slate-900/95 backdrop-blur-md text-white px-5 py-3.5 rounded-2xl shadow-2xl flex items-center space-x-3.5 border border-slate-700">
+                <span className="w-3 h-3 rounded-full bg-emerald-400 animate-ping"></span>
+                <span className="text-sm font-bold">{toast.message}</span>
                 <button
                   type="button"
                   onClick={() => setToast(null)}
-                  className="text-slate-400 hover:text-white p-1 rounded-lg focus:outline-none"
+                  className="text-slate-400 hover:text-white p-1 rounded-lg transition focus:outline-none"
                   title="Dismiss notification"
                 >
-                  <Icons.X className="w-3.5 h-3.5" />
+                  <Icons.X className="w-4 h-4" />
                 </button>
               </div>
             </div>
           )}
 
-          {/* Main Content Area */}
-          <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            {currentPage === "home" && (
-              <HomePage 
-                userProfile={userProfile}
-                onNavigateRequest={() => setCurrentPage("request")}
-                onNavigateMyRequests={() => setCurrentPage("my-requests")}
-                onNavigateProfile={() => setCurrentPage("profile")}
-                onSelectCategory={handleSelectCategoryAndNavigate}
-                onOpenInfo={() => setShowInfoModal(true)}
-              />
-            )}
+          {/* Main Animated Content Area */}
+          <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+            <div className="animate-fadeInUp" key={currentPage}>
+              {currentPage === "home" && (
+                <HomePage 
+                  userProfile={userProfile}
+                  onNavigateRequest={() => setCurrentPage("request")}
+                  onNavigateMyRequests={() => setCurrentPage("my-requests")}
+                  onNavigateProfile={() => setCurrentPage("profile")}
+                  onSelectCategory={handleSelectCategoryAndNavigate}
+                  onOpenInfo={() => setShowInfoModal(true)}
+                />
+              )}
 
-            {currentPage === "request" && (
-              <RequestPickupPage 
-                initialCategory={selectedCategory}
-                userProfile={userProfile}
-                onTriggerOtp={triggerOtpVerification}
-                onSubmit={handleCreateRequest}
-                onCancel={() => setCurrentPage("home")}
-                onNavigateProfile={() => setCurrentPage("profile")}
-              />
-            )}
+              {currentPage === "request" && (
+                <RequestPickupPage 
+                  initialCategory={selectedCategory}
+                  userProfile={userProfile}
+                  onTriggerOtp={triggerOtpVerification}
+                  onSubmit={handleCreateRequest}
+                  onCancel={() => setCurrentPage("home")}
+                  onNavigateProfile={() => setCurrentPage("profile")}
+                />
+              )}
 
-            {currentPage === "my-requests" && (
-              <MyRequestsPage 
-                requests={requests}
-                onNewRequest={() => setCurrentPage("request")}
-                onViewDetails={(req) => setActiveModalRequest(req)}
-                onCancelRequest={handleCancelRequest}
-                onDeleteRequest={handleDeleteRequest}
-                onReorder={handleReorder}
-              />
-            )}
+              {currentPage === "my-requests" && (
+                <MyRequestsPage 
+                  requests={requests}
+                  onNewRequest={() => setCurrentPage("request")}
+                  onViewDetails={(req) => setActiveModalRequest(req)}
+                  onCancelRequest={handleCancelRequest}
+                  onDeleteRequest={handleDeleteRequest}
+                  onReorder={handleReorder}
+                />
+              )}
 
-            {currentPage === "profile" && (
-              <ProfilePage 
-                userProfile={userProfile}
-                onUpdateProfile={updateUserProfile}
-                onTriggerOtp={triggerOtpVerification}
-                onSchedulePickup={() => setCurrentPage("request")}
-                onViewRequests={() => setCurrentPage("my-requests")}
-                onToast={showToast}
-              />
-            )}
+              {currentPage === "profile" && (
+                <ProfilePage 
+                  userProfile={userProfile}
+                  onUpdateProfile={updateUserProfile}
+                  onTriggerOtp={triggerOtpVerification}
+                  onSchedulePickup={() => setCurrentPage("request")}
+                  onViewRequests={() => setCurrentPage("my-requests")}
+                  onToast={showToast}
+                />
+              )}
 
-            {currentPage === "admin" && (
-              <AdminDashboardPage 
-                requests={requests}
-                totalRequests={totalRequests}
-                pendingCount={pendingCount}
-                scheduledCount={scheduledCount}
-                completedCount={completedCount}
-                onStatusChange={handleStatusChange}
-                onCancelRequest={handleCancelRequest}
-                onDeleteRequest={handleDeleteRequest}
-                onResetSampleData={handleResetSampleData}
-                onExportCSV={handleExportCSV}
-                onClearCompleted={handleClearCompleted}
-                onViewDetails={(req) => setActiveModalRequest(req)}
-                onOpenNewPickup={() => setCurrentPage("request")}
-              />
-            )}
+              {currentPage === "admin" && (
+                <AdminDashboardPage 
+                  requests={requests}
+                  totalRequests={totalRequests}
+                  pendingCount={pendingCount}
+                  scheduledCount={scheduledCount}
+                  completedCount={completedCount}
+                  onStatusChange={handleStatusChange}
+                  onCancelRequest={handleCancelRequest}
+                  onDeleteRequest={handleDeleteRequest}
+                  onResetSampleData={handleResetSampleData}
+                  onExportCSV={handleExportCSV}
+                  onClearCompleted={handleClearCompleted}
+                  onViewDetails={(req) => setActiveModalRequest(req)}
+                  onOpenNewPickup={() => setCurrentPage("request")}
+                />
+              )}
+            </div>
           </main>
 
           {/* Phone OTP Verification Modal */}
@@ -1042,19 +1190,21 @@
             <InfoModal onClose={() => setShowInfoModal(false)} />
           )}
 
-          {/* Clean Footer */}
-          <footer className="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-500 no-print mt-auto">
+          {/* Clean Glass Footer */}
+          <footer className="glass-header border-t border-slate-200/80 py-8 text-center text-xs text-slate-500 no-print mt-auto">
             <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="flex items-center space-x-2">
-                <Icons.Leaf className="w-4 h-4 text-emerald-600" />
-                <span className="font-bold text-slate-800">EcoCollect</span>
+              <div className="flex items-center space-x-2.5">
+                <div className="w-6 h-6 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                  <Icons.Leaf className="w-3.5 h-3.5" />
+                </div>
+                <span className="font-extrabold text-slate-800 text-sm">EcoCollect</span>
                 <span>— Smart Waste Collection Portal</span>
               </div>
-              <div className="flex flex-wrap items-center justify-center gap-4">
+              <div className="flex flex-wrap items-center justify-center gap-4 text-xs">
                 <button 
                   type="button"
                   onClick={handleResetSampleData}
-                  className="text-emerald-700 hover:text-emerald-800 font-semibold underline flex items-center"
+                  className="text-emerald-700 hover:text-emerald-800 font-bold hover:underline flex items-center transition"
                   title="Reload default sample dataset"
                 >
                   <Icons.Recycle className="w-3.5 h-3.5 mr-1" />
@@ -1064,16 +1214,16 @@
                 <button
                   type="button"
                   onClick={() => setShowInfoModal(true)}
-                  className="text-slate-600 hover:text-slate-900 font-semibold hover:underline flex items-center"
+                  className="text-slate-600 hover:text-slate-900 font-bold hover:underline flex items-center transition"
                 >
                   <Icons.Help className="w-3.5 h-3.5 mr-1 text-slate-500" />
-                  Help & FAQs
+                  Help &amp; FAQs
                 </button>
                 <span>•</span>
                 <button
                   type="button"
                   onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                  className="text-slate-600 hover:text-slate-900 font-semibold hover:underline flex items-center"
+                  className="text-slate-600 hover:text-slate-900 font-bold hover:underline flex items-center transition"
                 >
                   <Icons.ArrowUp className="w-3.5 h-3.5 mr-1 text-slate-500" />
                   Back to Top
@@ -1086,35 +1236,35 @@
     }
 
     // ==========================================
-    // PAGE 1: HOME PAGE
+    // PAGE 1: HOME PAGE WITH RICH ANIMATIONS
     // ==========================================
     function HomePage({ userProfile, onNavigateRequest, onNavigateMyRequests, onNavigateProfile, onSelectCategory, onOpenInfo }) {
       const categories = [
-        { title: "Plastic", desc: "Bottles, jugs & containers", icon: <Icons.Plastic className="w-7 h-7 text-blue-600" /> },
-        { title: "Paper", desc: "Cardboard & paper bags", icon: <Icons.Paper className="w-7 h-7 text-amber-600" /> },
-        { title: "Organic", desc: "Food scraps & garden waste", icon: <Icons.Leaf className="w-7 h-7 text-emerald-600" /> },
-        { title: "E-Waste", desc: "Batteries, cords & gadgets", icon: <Icons.EWaste className="w-7 h-7 text-purple-600" /> },
-        { title: "Other", desc: "Mixed recyclable goods", icon: <Icons.Other className="w-7 h-7 text-slate-600" /> },
+        { title: "Plastic", desc: "Bottles, jugs & containers", glow: "hover:border-blue-400 hover:shadow-blue-500/20", icon: <Icons.Plastic className="w-8 h-8 text-blue-600" /> },
+        { title: "Paper", desc: "Cardboard & paper bags", glow: "hover:border-amber-400 hover:shadow-amber-500/20", icon: <Icons.Paper className="w-8 h-8 text-amber-600" /> },
+        { title: "Organic", desc: "Food scraps & garden waste", glow: "hover:border-emerald-400 hover:shadow-emerald-500/20", icon: <Icons.Leaf className="w-8 h-8 text-emerald-600" /> },
+        { title: "E-Waste", desc: "Batteries, cords & gadgets", glow: "hover:border-purple-400 hover:shadow-purple-500/20", icon: <Icons.EWaste className="w-8 h-8 text-purple-600" /> },
+        { title: "Other", desc: "Mixed recyclable goods", glow: "hover:border-teal-400 hover:shadow-teal-500/20", icon: <Icons.Other className="w-8 h-8 text-teal-600" /> },
       ];
 
       return (
         <div className="space-y-12">
-          {/* User Welcome Banner if Authenticated */}
-          <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white font-extrabold text-sm flex items-center justify-center shadow-sm">
+          {/* User Welcome Banner with Shimmer & Verification Badge */}
+          <div className="glass-card border border-emerald-200/80 rounded-3xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm hover:shadow-md transition-all duration-300">
+            <div className="flex items-center space-x-3.5">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white font-extrabold text-base flex items-center justify-center shadow-md shadow-emerald-500/30 animate-float">
                 {userProfile.name.charAt(0)}
               </div>
               <div>
                 <div className="flex items-center space-x-2">
-                  <span className="font-bold text-slate-900 text-sm">Welcome back, {userProfile.name}!</span>
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                  <span className="font-extrabold text-slate-900 text-sm sm:text-base">Welcome back, {userProfile.name}!</span>
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 animate-pulse">
                     <Icons.ShieldCheck className="w-3.5 h-3.5 mr-1 text-emerald-600" />
                     Mobile Verified
                   </span>
                 </div>
-                <p className="text-xs text-slate-500">
-                  Phone: +91 {userProfile.phone} • {userProfile.savedAddresses.length} Saved Addresses • {userProfile.ecoPoints} Eco-Points
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Phone: +91 {userProfile.phone} • {userProfile.savedAddresses.length} Saved Addresses • <span className="font-extrabold text-emerald-600">{userProfile.ecoPoints} Eco-Points</span>
                 </p>
               </div>
             </div>
@@ -1122,30 +1272,35 @@
               <button
                 type="button"
                 onClick={onNavigateProfile}
-                className="px-3.5 py-1.5 bg-white border border-emerald-300 text-emerald-800 hover:bg-emerald-100 rounded-xl text-xs font-bold transition shadow-sm"
+                className="px-4 py-2 bg-white border border-emerald-300 text-emerald-800 hover:bg-emerald-50 rounded-2xl text-xs font-bold transition shadow-sm hover:scale-105 active:scale-95"
               >
-                Manage Profile &amp; Addresses
+                Manage Profile &amp; Addresses →
               </button>
             </div>
           </div>
 
-          {/* Hero Section */}
-          <div className="bg-gradient-to-br from-emerald-800 via-emerald-700 to-teal-900 text-white rounded-3xl p-8 sm:p-14 shadow-2xl shadow-emerald-950/20 relative overflow-hidden">
-            {/* Background decorative circles */}
-            <div className="absolute -right-16 -top-16 w-72 h-72 rounded-full bg-emerald-400/20 blur-3xl pointer-events-none"></div>
-            <div className="absolute -left-12 -bottom-12 w-64 h-64 rounded-full bg-teal-300/15 blur-2xl pointer-events-none"></div>
+          {/* Hero Section with Vibrant Mesh, Floating Orbs & Shimmer CTA */}
+          <div className="relative bg-gradient-to-br from-emerald-900 via-emerald-800 to-teal-950 text-white rounded-[2.5rem] p-8 sm:p-16 shadow-2xl shadow-emerald-950/30 overflow-hidden">
+            {/* Ambient Floating Glow Orbs */}
+            <div className="absolute -right-20 -top-20 w-80 h-80 rounded-full bg-emerald-400/20 blur-3xl pointer-events-none animate-float"></div>
+            <div className="absolute -left-16 -bottom-16 w-72 h-72 rounded-full bg-teal-400/20 blur-3xl pointer-events-none animate-float-reverse"></div>
+            <div className="absolute right-1/4 bottom-1/4 w-40 h-40 rounded-full bg-emerald-300/10 blur-2xl pointer-events-none animate-spin-slow"></div>
 
             <div className="relative z-10 max-w-2xl">
-              <div className="inline-flex items-center space-x-2 bg-emerald-900/70 backdrop-blur-md border border-emerald-400/30 px-4 py-1.5 rounded-full text-xs font-semibold text-emerald-100 mb-6 shadow-sm">
-                <Icons.Leaf className="w-3.5 h-3.5 text-emerald-300" />
+              {/* Animated Floating Pill */}
+              <div className="inline-flex items-center space-x-2 bg-emerald-900/80 backdrop-blur-md border border-emerald-400/30 px-4 py-1.5 rounded-full text-xs font-extrabold text-emerald-100 mb-6 shadow-sm animate-float">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
                 <span>Verified Doorstep Waste Collection &amp; Recycling</span>
               </div>
 
-              <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-white mb-4 leading-tight">
-                EcoCollect
+              <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-white mb-5 leading-tight">
+                Eco<span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-teal-200 to-emerald-100">Collect</span>
               </h1>
 
-              <p className="text-emerald-100 text-base sm:text-lg mb-8 leading-relaxed max-w-xl">
+              <p className="text-emerald-100/90 text-base sm:text-lg mb-8 leading-relaxed max-w-xl font-medium">
                 Certified, prompt, and responsible waste pickup. Schedule collection for your household recyclables with authenticated phone and GPS-verified addresses.
               </p>
 
@@ -1153,9 +1308,9 @@
                 <button
                   type="button"
                   onClick={onNavigateRequest}
-                  className="inline-flex items-center justify-center px-7 py-4 rounded-2xl bg-white text-emerald-900 font-extrabold text-base hover:bg-emerald-50 transition shadow-xl shadow-emerald-950/30 active:scale-95 transform hover:-translate-y-0.5 cursor-pointer"
+                  className="btn-shimmer inline-flex items-center justify-center px-8 py-4 rounded-2xl bg-white text-emerald-950 font-extrabold text-base hover:bg-emerald-50 transition shadow-2xl shadow-emerald-950/40 active:scale-95 transform hover:-translate-y-1 cursor-pointer"
                 >
-                  <Icons.Plus className="w-5 h-5 mr-2 text-emerald-600" />
+                  <Icons.Plus className="w-5 h-5 mr-2 text-emerald-600 animate-spin-slow" />
                   Request Waste Pickup
                   <Icons.ArrowRight className="w-5 h-5 ml-2 text-emerald-700" />
                 </button>
@@ -1163,7 +1318,7 @@
                 <button
                   type="button"
                   onClick={onNavigateMyRequests}
-                  className="inline-flex items-center justify-center px-7 py-4 rounded-2xl bg-emerald-900/60 hover:bg-emerald-900/90 text-white font-bold text-base border border-emerald-400/30 backdrop-blur-sm transition active:scale-95 cursor-pointer"
+                  className="inline-flex items-center justify-center px-8 py-4 rounded-2xl bg-emerald-900/60 hover:bg-emerald-900/90 text-white font-extrabold text-base border border-emerald-400/30 backdrop-blur-sm transition active:scale-95 hover:border-emerald-300 cursor-pointer"
                 >
                   View My Requests
                 </button>
@@ -1171,91 +1326,91 @@
             </div>
           </div>
 
-          {/* Waste Categories Showcase - ALL ARE CLICKABLE BUTTONS */}
+          {/* Waste Categories Showcase - ALL ARE ANIMATED CARDS */}
           <div>
             <div className="text-center max-w-xl mx-auto mb-8">
-              <div className="inline-flex items-center px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold mb-2">
-                Click Any Category To Book
+              <div className="inline-flex items-center px-3.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-extrabold mb-2 shadow-sm">
+                ⚡ Click Any Category To Book
               </div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">Supported Waste Categories</h2>
-              <p className="text-sm text-slate-500 mt-1">Select a category below to instantly begin your pickup request</p>
+              <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900">Supported Waste Categories</h2>
+              <p className="text-sm text-slate-500 mt-1.5">Select a category below to instantly begin your verified pickup request</p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-5 gap-4">
-              {categories.map((item) => (
+            <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-5 gap-5">
+              {categories.map((item, idx) => (
                 <button
                   key={item.title}
                   type="button"
                   onClick={() => onSelectCategory(item.title)}
-                  className="group bg-white p-6 rounded-3xl border-2 border-slate-200 text-center flex flex-col items-center hover:border-emerald-500 hover:shadow-xl hover:-translate-y-1 transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className={`group glass-card p-6 rounded-3xl border-2 border-slate-200 text-center flex flex-col items-center hover:shadow-2xl ${item.glow} hover:-translate-y-2.5 transition-all duration-300 cursor-pointer focus:outline-none focus:ring-4 focus:ring-emerald-500/20`}
                   title={`Request pickup for ${item.title}`}
                 >
-                  <div className="w-16 h-16 rounded-2xl bg-slate-50 group-hover:bg-emerald-50 flex items-center justify-center mb-4 transition-colors">
+                  <div className="w-16 h-16 rounded-2xl bg-slate-50 group-hover:bg-white flex items-center justify-center mb-4 transition-all duration-300 shadow-sm group-hover:scale-110 group-hover:rotate-6">
                     {item.icon}
                   </div>
-                  <h3 className="font-extrabold text-slate-900 text-base group-hover:text-emerald-700 transition">
+                  <h3 className="font-extrabold text-slate-900 text-lg group-hover:text-emerald-700 transition">
                     {item.title}
                   </h3>
-                  <p className="text-xs text-slate-500 mt-1 mb-4 flex-1">
+                  <p className="text-xs text-slate-500 mt-1 mb-5 flex-1">
                     {item.desc}
                   </p>
-                  <span className="w-full py-1.5 px-3 rounded-xl bg-slate-100 group-hover:bg-emerald-600 text-slate-700 group-hover:text-white text-xs font-bold transition flex items-center justify-center">
+                  <span className="w-full py-2 px-3 rounded-2xl bg-slate-100 group-hover:bg-emerald-600 text-slate-700 group-hover:text-white text-xs font-extrabold transition-all duration-300 flex items-center justify-center shadow-sm">
                     Select &amp; Request
-                    <Icons.ArrowRight className="w-3.5 h-3.5 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <Icons.ArrowRight className="w-3.5 h-3.5 ml-1.5 transform group-hover:translate-x-1 transition-transform" />
                   </span>
                 </button>
               ))}
             </div>
           </div>
 
-          {/* 3 Simple Steps */}
-          <div className="bg-white rounded-3xl p-8 sm:p-10 border border-slate-200 shadow-sm">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 mb-6 border-b border-slate-100 gap-4">
+          {/* 3 Simple Steps with Animated Line */}
+          <div className="glass-card rounded-[2rem] p-8 sm:p-12 border border-slate-200 shadow-sm relative overflow-hidden">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 mb-8 border-b border-slate-100 gap-4">
               <div>
-                <h2 className="text-xl sm:text-2xl font-bold text-slate-900">How EcoCollect Works</h2>
-                <p className="text-xs sm:text-sm text-slate-500 mt-0.5">Secure OTP mobile authentication, GPS address verification, certified recycling</p>
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">How EcoCollect Works</h2>
+                <p className="text-xs sm:text-sm text-slate-500 mt-1">Secure OTP mobile authentication, GPS address verification, certified recycling</p>
               </div>
               <button
                 type="button"
                 onClick={onOpenInfo}
-                className="inline-flex items-center text-xs font-bold text-emerald-700 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-3.5 py-2 rounded-xl transition"
+                className="inline-flex items-center text-xs font-bold text-emerald-700 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-4 py-2.5 rounded-2xl transition shadow-sm hover:scale-105 active:scale-95"
               >
                 <Icons.Help className="w-4 h-4 mr-1.5" />
                 Frequently Asked Questions
               </button>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 font-extrabold text-lg flex items-center justify-center shrink-0 shadow-sm">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+              <div className="flex items-start space-x-4 p-5 rounded-2xl bg-white/60 border border-slate-100 hover:border-emerald-300 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white font-extrabold text-lg flex items-center justify-center shrink-0 shadow-md shadow-emerald-500/30 animate-pulse">
                   1
                 </div>
                 <div>
-                  <h4 className="font-bold text-slate-800 text-base">OTP Verified Details</h4>
+                  <h4 className="font-extrabold text-slate-900 text-base">OTP Verified Details</h4>
                   <p className="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed">
                     Authenticate your mobile number via OTP and pinpoint your exact street address or use saved addresses.
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 font-extrabold text-lg flex items-center justify-center shrink-0 shadow-sm">
+              <div className="flex items-start space-x-4 p-5 rounded-2xl bg-white/60 border border-slate-100 hover:border-emerald-300 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white font-extrabold text-lg flex items-center justify-center shrink-0 shadow-md shadow-emerald-500/30 animate-pulse">
                   2
                 </div>
                 <div>
-                  <h4 className="font-bold text-slate-800 text-base">Admin Route Scheduling</h4>
+                  <h4 className="font-extrabold text-slate-900 text-base">Admin Route Scheduling</h4>
                   <p className="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed">
                     Our coordinator reviews your location and schedules an eco-friendly collection vehicle to your area.
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 font-extrabold text-lg flex items-center justify-center shrink-0 shadow-sm">
+              <div className="flex items-start space-x-4 p-5 rounded-2xl bg-white/60 border border-slate-100 hover:border-emerald-300 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white font-extrabold text-lg flex items-center justify-center shrink-0 shadow-md shadow-emerald-500/30 animate-pulse">
                   3
                 </div>
                 <div>
-                  <h4 className="font-bold text-slate-800 text-base">Doorstep Pickup &amp; Credits</h4>
+                  <h4 className="font-extrabold text-slate-900 text-base">Doorstep Pickup &amp; Credits</h4>
                   <p className="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed">
                     Our crew collects your segregated waste and awards reward points directly to your verified profile.
                   </p>
@@ -1263,14 +1418,14 @@
               </div>
             </div>
 
-            <div className="mt-8 pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="text-xs text-slate-500">
+            <div className="mt-10 pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="text-xs text-slate-500 font-medium">
                 Ready to recycle? Booking takes under 60 seconds with your verified profile.
               </div>
               <button
                 type="button"
                 onClick={onNavigateRequest}
-                className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-md shadow-emerald-600/20 transition active:scale-95"
+                className="btn-shimmer w-full sm:w-auto inline-flex items-center justify-center px-7 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm shadow-lg shadow-emerald-600/30 transition hover:-translate-y-0.5 active:scale-95"
               >
                 <Icons.Plus className="w-4 h-4 mr-2" />
                 Schedule Waste Pickup Now
@@ -1282,7 +1437,7 @@
     }
 
     // ==========================================
-    // PAGE 2: REQUEST PICKUP FORM WITH VALIDATIONS
+    // PAGE 2: REQUEST PICKUP FORM WITH ANIMATIONS
     // ==========================================
     function RequestPickupPage({ initialCategory, userProfile, onTriggerOtp, onSubmit, onCancel, onNavigateProfile }) {
       const [formData, setFormData] = useState({
@@ -1302,7 +1457,6 @@
 
       const [errors, setErrors] = useState({});
       const [isDetectingGps, setIsDetectingGps] = useState(false);
-      const [saveToProfile, setSaveToProfile] = useState(false);
 
       useEffect(() => {
         if (initialCategory) {
@@ -1310,64 +1464,33 @@
         }
       }, [initialCategory]);
 
-      // Comprehensive Validations for Form and Address
       const validate = () => {
         const errs = {};
-        
-        // Name validation
         if (!formData.name.trim()) {
           errs.name = "Full name is required";
         } else if (formData.name.trim().length < 2) {
           errs.name = "Name must be at least 2 characters";
-        } else if (!/^[a-zA-Z\s.'-]+$/.test(formData.name.trim())) {
-          errs.name = "Name can only contain letters, spaces and periods";
         }
 
-        // Phone validation (10 digits)
         const cleanPhone = formData.phone.replace(/\D/g, "");
         if (!formData.phone.trim()) {
           errs.phone = "Mobile phone number is required";
         } else if (cleanPhone.length !== 10) {
-          errs.phone = "Mobile number must be exactly 10 digits (e.g. 9876543210)";
+          errs.phone = "Mobile number must be exactly 10 digits";
         } else if (!formData.isPhoneVerified) {
           errs.phone = "Mobile number must be OTP verified before booking";
         }
 
-        // Category
-        if (!formData.category) {
-          errs.category = "Please select a waste category";
+        if (!formData.category) errs.category = "Please select a waste category";
+        if (!formData.flat.trim()) errs.flat = "House / Flat number is required";
+        if (!formData.street.trim()) errs.street = "Street / Area is required";
+        if (!formData.city.trim()) errs.city = "City name is required";
+        if (!formData.pincode.trim() || !/^\d{5,6}$/.test(formData.pincode.trim())) {
+          errs.pincode = "Enter a valid 5 or 6 digit PIN code";
         }
 
-        // Structured Address Validations
-        if (!formData.flat.trim()) {
-          errs.flat = "House / Flat / Door number is required";
-        } else if (formData.flat.trim().length < 2) {
-          errs.flat = "Enter a valid flat or building address";
-        }
-
-        if (!formData.street.trim()) {
-          errs.street = "Street / Area / Road name is required";
-        } else if (formData.street.trim().length < 4) {
-          errs.street = "Street name is too short (min 4 characters)";
-        }
-
-        if (!formData.city.trim()) {
-          errs.city = "City name is required";
-        } else if (!/^[a-zA-Z\s-]+$/.test(formData.city.trim())) {
-          errs.city = "City name should only contain letters";
-        }
-
-        if (!formData.pincode.trim()) {
-          errs.pincode = "Postal PIN code is required";
-        } else if (!/^\d{5,6}$/.test(formData.pincode.trim())) {
-          errs.pincode = "Enter a valid 5 or 6 digit PIN / Postal code";
-        }
-
-        // Date validation
         const todayStr = new Date().toISOString().split("T")[0];
-        if (!formData.date) {
-          errs.date = "Pickup date is required";
-        } else if (formData.date < todayStr) {
+        if (!formData.date || formData.date < todayStr) {
           errs.date = "Pickup date cannot be in the past";
         }
 
@@ -1375,7 +1498,6 @@
         return Object.keys(errs).length === 0;
       };
 
-      // Handle Phone change
       const handlePhoneChange = (val) => {
         const cleaned = val.replace(/\D/g, "").slice(0, 10);
         const isSameAsProfile = cleaned === userProfile.phone && userProfile.isPhoneVerified;
@@ -1384,12 +1506,9 @@
           phone: cleaned,
           isPhoneVerified: isSameAsProfile
         });
-        if (errors.phone) {
-          setErrors({ ...errors, phone: null });
-        }
+        if (errors.phone) setErrors({ ...errors, phone: null });
       };
 
-      // Trigger OTP verification for current phone
       const handleVerifyPhoneClick = () => {
         const cleaned = formData.phone.replace(/\D/g, "");
         if (cleaned.length !== 10) {
@@ -1402,7 +1521,6 @@
         });
       };
 
-      // Apply saved address from Profile
       const handleSelectSavedAddress = (addr) => {
         setFormData(prev => ({
           ...prev,
@@ -1416,14 +1534,12 @@
         setErrors(prev => ({ ...prev, flat: null, street: null, city: null, pincode: null }));
       };
 
-      // GPS Location Detection
       const handleDetectGps = () => {
         setIsDetectingGps(true);
         if ("geolocation" in navigator) {
           navigator.geolocation.getCurrentPosition(
             (pos) => {
               setIsDetectingGps(false);
-              // Auto-fill realistic authenticated coordinates and verified address
               setFormData(prev => ({
                 ...prev,
                 flat: prev.flat || "GPS Geo-Location Point",
@@ -1435,9 +1551,8 @@
               }));
               setErrors(prev => ({ ...prev, flat: null, street: null, city: null, pincode: null }));
             },
-            (err) => {
+            () => {
               setIsDetectingGps(false);
-              // Fallback default authenticated mock
               setFormData(prev => ({
                 ...prev,
                 flat: "Flat 101, Green Horizon",
@@ -1448,37 +1563,25 @@
                 pincode: "97477"
               }));
             },
-            { timeout: 5000 }
+            { timeout: 4000 }
           );
         } else {
           setIsDetectingGps(false);
-          setFormData(prev => ({
-            ...prev,
-            flat: "House 24, Sun Crest",
-            street: "12 Valley Road",
-            city: "Springfield",
-            state: "California",
-            pincode: "97477"
-          }));
         }
       };
 
-      // Form submission
       const handleSubmit = (e) => {
         e.preventDefault();
-        
-        // If phone not verified, prompt verification automatically
         const cleanPhone = formData.phone.replace(/\D/g, "");
         if (cleanPhone.length === 10 && !formData.isPhoneVerified) {
           handleVerifyPhoneClick();
           return;
         }
-
         if (!validate()) return;
 
         const fullFormattedAddress = `${formData.flat}, ${formData.street}${formData.landmark ? `, ${formData.landmark}` : ""}, ${formData.city}, ${formData.state} - ${formData.pincode}`;
-
         const randomNum = Math.floor(1000 + Math.random() * 9000);
+
         const newRequest = {
           id: `EC-${randomNum}`,
           name: formData.name.trim(),
@@ -1501,7 +1604,6 @@
         onSubmit(newRequest);
       };
 
-      // Auto-fill demo data
       const handleAutoFill = () => {
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
@@ -1529,11 +1631,11 @@
 
       return (
         <div className="max-w-2xl mx-auto">
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-xl p-6 sm:p-10">
+          <div className="glass-card rounded-[2.5rem] border border-slate-200/80 shadow-2xl p-6 sm:p-10">
             {/* Header */}
             <div className="mb-6 pb-4 border-b border-slate-100 flex items-start justify-between">
               <div>
-                <div className="flex items-center space-x-2 text-emerald-600 font-semibold text-xs tracking-wider uppercase mb-1">
+                <div className="flex items-center space-x-2 text-emerald-600 font-extrabold text-xs tracking-wider uppercase mb-1">
                   <Icons.Plus className="w-4 h-4" />
                   <span>Authenticated Pickup Scheduler</span>
                 </div>
@@ -1541,39 +1643,37 @@
                 <p className="text-xs text-slate-500 mt-1">Verified mobile authentication and validated doorstep address</p>
               </div>
 
-              {/* Auto-Fill Demo Button */}
               <button
                 type="button"
                 onClick={handleAutoFill}
-                className="inline-flex items-center text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3.5 py-1.5 rounded-xl shadow-sm transition active:scale-95"
+                className="btn-shimmer inline-flex items-center text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3.5 py-2 rounded-2xl shadow-sm transition active:scale-95 hover:scale-105"
                 title="Fill verified demo data with 1 click"
               >
-                <Icons.Sparkles className="w-3.5 h-3.5 mr-1.5 text-emerald-600" />
+                <Icons.Sparkles className="w-3.5 h-3.5 mr-1.5 text-emerald-600 animate-spin-slow" />
                 Auto-Fill Demo
               </button>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Requester Contact & Mobile Authentication */}
-              <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4">
+              {/* Requester Contact */}
+              <div className="p-5 rounded-3xl bg-slate-50/80 border border-slate-200/80 space-y-4 shadow-sm">
                 <div className="flex items-center justify-between">
                   <h3 className="text-xs font-extrabold text-slate-800 uppercase tracking-wider flex items-center">
                     <Icons.ShieldCheck className="w-4 h-4 mr-1.5 text-emerald-600" />
                     Requester &amp; Mobile Authentication
                   </h3>
                   {formData.isPhoneVerified ? (
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
                       ✓ Mobile Authenticated
                     </span>
                   ) : (
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-300">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-300 animate-pulse">
                       OTP Verification Required
                     </span>
                   )}
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {/* Name */}
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1">
                       Full Name *
@@ -1587,7 +1687,7 @@
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         placeholder="e.g. Jane Cooper"
-                        className={`w-full pl-9 pr-3 py-2 bg-white border rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 transition ${
+                        className={`w-full pl-9 pr-3 py-2.5 bg-white border rounded-2xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 transition shadow-sm ${
                           errors.name ? "border-rose-400 bg-rose-50/20" : "border-slate-200"
                         }`}
                       />
@@ -1595,7 +1695,6 @@
                     {errors.name && <p className="text-rose-500 text-[11px] mt-1">{errors.name}</p>}
                   </div>
 
-                  {/* Mobile Number with OTP Verification Button */}
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1">
                       10-Digit Mobile Number *
@@ -1611,18 +1710,17 @@
                           onChange={(e) => handlePhoneChange(e.target.value)}
                           placeholder="9876543210"
                           maxLength="10"
-                          className={`w-full pl-10 pr-3 py-2 bg-white border rounded-xl text-xs font-mono font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500 transition ${
+                          className={`w-full pl-10 pr-3 py-2.5 bg-white border rounded-2xl text-xs font-mono font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500 transition shadow-sm ${
                             errors.phone ? "border-rose-400 bg-rose-50/20" : "border-slate-200"
                           }`}
                         />
                       </div>
 
-                      {/* OTP Action Button */}
                       {!formData.isPhoneVerified ? (
                         <button
                           type="button"
                           onClick={handleVerifyPhoneClick}
-                          className="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-sm transition active:scale-95 whitespace-nowrap"
+                          className="px-3.5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl text-xs font-bold shadow-md shadow-emerald-600/30 transition active:scale-95 whitespace-nowrap hover:scale-105"
                         >
                           Verify OTP
                         </button>
@@ -1630,7 +1728,7 @@
                         <button
                           type="button"
                           onClick={handleVerifyPhoneClick}
-                          className="px-2.5 py-2 bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-xl text-xs font-bold flex items-center whitespace-nowrap"
+                          className="px-3 py-2.5 bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-2xl text-xs font-bold flex items-center whitespace-nowrap"
                           title="Mobile is authenticated. Click to re-verify if needed."
                         >
                           ✓ Verified
@@ -1642,22 +1740,21 @@
                 </div>
               </div>
 
-              {/* Waste Category Selection */}
+              {/* Category Pills */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                <label className="block text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-2">
                   Waste Category *
                 </label>
-                {/* 1-Click Category Pills */}
-                <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 mb-2">
+                <div className="grid grid-cols-3 sm:grid-cols-5 gap-2.5 mb-2">
                   {categoryOptions.map((cat) => (
                     <button
                       key={cat}
                       type="button"
                       onClick={() => setFormData({ ...formData, category: cat })}
-                      className={`py-2 px-2 rounded-xl text-xs font-bold transition border ${
+                      className={`py-2.5 px-2 rounded-2xl text-xs font-bold transition-all duration-200 border ${
                         formData.category === cat
-                          ? "bg-emerald-600 text-white border-emerald-600 shadow-sm"
-                          : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
+                          ? "bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-600/30 scale-105"
+                          : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:border-slate-300"
                       }`}
                     >
                       {cat}
@@ -1666,8 +1763,8 @@
                 </div>
               </div>
 
-              {/* Structured Address Authentication & Validation */}
-              <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4">
+              {/* Structured Address */}
+              <div className="p-5 rounded-3xl bg-slate-50/80 border border-slate-200/80 space-y-4 shadow-sm">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-200/60">
                   <div>
                     <h3 className="text-xs font-extrabold text-slate-800 uppercase tracking-wider flex items-center">
@@ -1678,36 +1775,34 @@
                   </div>
 
                   <div className="flex items-center space-x-2">
-                    {/* GPS Detect Button */}
                     <button
                       type="button"
                       onClick={handleDetectGps}
                       disabled={isDetectingGps}
-                      className="inline-flex items-center px-3 py-1.5 rounded-xl bg-white border border-slate-300 text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 hover:border-emerald-300 text-xs font-bold transition shadow-sm"
+                      className="inline-flex items-center px-3.5 py-1.5 rounded-xl bg-white border border-slate-300 text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 hover:border-emerald-300 text-xs font-bold transition shadow-sm hover:scale-105 active:scale-95"
                       title="Use device GPS to locate address"
                     >
                       <Icons.Navigation className={`w-3.5 h-3.5 mr-1 text-emerald-600 ${isDetectingGps ? 'animate-spin' : ''}`} />
                       {isDetectingGps ? "Detecting..." : "Detect GPS"}
                     </button>
 
-                    {/* Saved Addresses Shortcut Button */}
                     {userProfile.savedAddresses.length > 0 && (
                       <div className="relative group">
                         <button
                           type="button"
-                          className="px-3 py-1.5 rounded-xl bg-emerald-100 text-emerald-800 text-xs font-bold hover:bg-emerald-200 transition"
+                          className="px-3.5 py-1.5 rounded-xl bg-emerald-100 text-emerald-800 text-xs font-bold hover:bg-emerald-200 transition"
                         >
                           Saved Addresses ▾
                         </button>
-                        <div className="absolute right-0 top-full mt-1 w-56 bg-white border border-slate-200 rounded-xl shadow-xl p-1.5 z-20 hidden group-hover:block">
+                        <div className="absolute right-0 top-full mt-1 w-60 bg-white border border-slate-200 rounded-2xl shadow-2xl p-2 z-20 hidden group-hover:block animate-popIn">
                           {userProfile.savedAddresses.map(addr => (
                             <button
                               key={addr.id}
                               type="button"
                               onClick={() => handleSelectSavedAddress(addr)}
-                              className="w-full text-left px-3 py-2 rounded-lg text-xs hover:bg-emerald-50 text-slate-800 font-medium"
+                              className="w-full text-left px-3 py-2 rounded-xl text-xs hover:bg-emerald-50 text-slate-800 font-medium transition"
                             >
-                              <span className="font-bold block">{addr.label} ({addr.city})</span>
+                              <span className="font-bold block text-slate-900">{addr.label} ({addr.city})</span>
                               <span className="text-[11px] text-slate-500 truncate block">{addr.street}</span>
                             </button>
                           ))}
@@ -1717,7 +1812,6 @@
                   </div>
                 </div>
 
-                {/* Flat & Street */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1">
@@ -1728,7 +1822,7 @@
                       value={formData.flat}
                       onChange={(e) => setFormData({ ...formData, flat: e.target.value })}
                       placeholder="e.g. Flat 402, Green Meadows"
-                      className={`w-full px-3 py-2 bg-white border rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 transition ${
+                      className={`w-full px-3.5 py-2.5 bg-white border rounded-2xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 transition shadow-sm ${
                         errors.flat ? "border-rose-400 bg-rose-50/20" : "border-slate-200"
                       }`}
                     />
@@ -1744,7 +1838,7 @@
                       value={formData.street}
                       onChange={(e) => setFormData({ ...formData, street: e.target.value })}
                       placeholder="e.g. 742 Evergreen Terrace"
-                      className={`w-full px-3 py-2 bg-white border rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 transition ${
+                      className={`w-full px-3.5 py-2.5 bg-white border rounded-2xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 transition shadow-sm ${
                         errors.street ? "border-rose-400 bg-rose-50/20" : "border-slate-200"
                       }`}
                     />
@@ -1752,7 +1846,6 @@
                   </div>
                 </div>
 
-                {/* Landmark & City */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1">
@@ -1762,8 +1855,8 @@
                       type="text"
                       value={formData.landmark}
                       onChange={(e) => setFormData({ ...formData, landmark: e.target.value })}
-                      placeholder="e.g. Opposite Central Park"
-                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
+                      placeholder="e.g. Near Central Park"
+                      className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-2xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 transition shadow-sm"
                     />
                   </div>
 
@@ -1776,7 +1869,7 @@
                       value={formData.city}
                       onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                       placeholder="e.g. Springfield"
-                      className={`w-full px-3 py-2 bg-white border rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 transition ${
+                      className={`w-full px-3.5 py-2.5 bg-white border rounded-2xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 transition shadow-sm ${
                         errors.city ? "border-rose-400 bg-rose-50/20" : "border-slate-200"
                       }`}
                     />
@@ -1792,8 +1885,8 @@
                       maxLength="6"
                       value={formData.pincode}
                       onChange={(e) => setFormData({ ...formData, pincode: e.target.value.replace(/\D/g, "") })}
-                      placeholder="e.g. 97477 or 560001"
-                      className={`w-full px-3 py-2 bg-white border rounded-xl text-xs font-mono font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500 transition ${
+                      placeholder="e.g. 97477"
+                      className={`w-full px-3.5 py-2.5 bg-white border rounded-2xl text-xs font-mono font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500 transition shadow-sm ${
                         errors.pincode ? "border-rose-400 bg-rose-50/20" : "border-slate-200"
                       }`}
                     />
@@ -1801,7 +1894,6 @@
                   </div>
                 </div>
 
-                {/* State */}
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">
                     State / Region *
@@ -1809,7 +1901,7 @@
                   <select
                     value={formData.state}
                     onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 transition cursor-pointer"
+                    className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-2xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 transition cursor-pointer shadow-sm"
                   >
                     {states.map(st => (
                       <option key={st} value={st}>{st}</option>
@@ -1818,9 +1910,9 @@
                 </div>
               </div>
 
-              {/* Pickup Preferred Date */}
+              {/* Pickup Date */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-1.5">
                   Pickup Date *
                 </label>
                 <div className="relative">
@@ -1832,7 +1924,7 @@
                     min={new Date().toISOString().split("T")[0]}
                     value={formData.date}
                     onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                    className={`w-full pl-10 pr-4 py-2.5 bg-slate-50 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition ${
+                    className={`w-full pl-10 pr-4 py-3 bg-slate-50 border rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition shadow-sm ${
                       errors.date ? "border-rose-400 bg-rose-50/30" : "border-slate-200"
                     }`}
                   />
@@ -1842,7 +1934,7 @@
 
               {/* Instructions */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-1.5">
                   Collection Notes / Instructions (Optional)
                 </label>
                 <input
@@ -1850,23 +1942,23 @@
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                   placeholder="e.g. Leave near front gate, ring bell #402"
-                  className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition"
+                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition shadow-sm"
                 />
               </div>
 
-              {/* Buttons: Cancel & Submit */}
+              {/* Action Buttons */}
               <div className="pt-4 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100">
                 <button
                   type="button"
                   onClick={onCancel}
-                  className="px-4 py-2.5 text-sm font-semibold text-slate-600 hover:text-slate-900 transition rounded-xl hover:bg-slate-100"
+                  className="px-5 py-3 text-sm font-bold text-slate-600 hover:text-slate-900 transition rounded-2xl hover:bg-slate-100"
                 >
                   Cancel
                 </button>
 
                 <button
                   type="submit"
-                  className="px-7 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm shadow-xl shadow-emerald-600/30 active:scale-95 transition flex items-center cursor-pointer"
+                  className="btn-shimmer px-8 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm shadow-xl shadow-emerald-600/30 active:scale-95 transition flex items-center cursor-pointer hover:-translate-y-0.5"
                 >
                   <Icons.CheckCircle className="w-4 h-4 mr-2" />
                   {formData.isPhoneVerified ? "Submit Verified Pickup Request" : "Verify Phone & Submit"}
@@ -1879,7 +1971,7 @@
     }
 
     // ==========================================
-    // PAGE 3: MY REQUESTS
+    // PAGE 3: MY REQUESTS WITH ANIMATIONS
     // ==========================================
     function MyRequestsPage({ requests, onNewRequest, onViewDetails, onCancelRequest, onDeleteRequest, onReorder }) {
       const [filter, setFilter] = useState("All");
@@ -1890,23 +1982,22 @@
 
       return (
         <div className="space-y-6">
-          {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <div className="flex items-center space-x-2">
-                <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold tracking-wider uppercase">
+                <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-extrabold tracking-wider uppercase shadow-sm">
                   User Dashboard
                 </span>
                 <span className="text-xs text-slate-400">Authenticated Tracking</span>
               </div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">My Requests</h2>
+              <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 mt-1">My Requests</h2>
               <p className="text-xs sm:text-sm text-slate-500 mt-0.5">Track, cancel, or re-order your collection bookings</p>
             </div>
 
             <button
               type="button"
               onClick={onNewRequest}
-              className="inline-flex items-center justify-center px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-md shadow-emerald-600/20 transition active:scale-95 cursor-pointer"
+              className="btn-shimmer inline-flex items-center justify-center px-5 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm shadow-lg shadow-emerald-600/25 transition active:scale-95 hover:scale-105 cursor-pointer"
             >
               <Icons.Plus className="w-4 h-4 mr-1.5" />
               Schedule New Pickup
@@ -1920,10 +2011,10 @@
                 key={item}
                 type="button"
                 onClick={() => setFilter(item)}
-                className={`px-3.5 py-2 rounded-xl font-bold transition flex items-center ${
+                className={`px-4 py-2 rounded-2xl font-extrabold transition-all duration-200 flex items-center ${
                   filter === item
-                    ? "bg-slate-900 text-white shadow-sm"
-                    : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-100"
+                    ? "bg-slate-900 text-white shadow-md scale-105"
+                    : "bg-white/80 text-slate-600 border border-slate-200 hover:bg-slate-100"
                 }`}
               >
                 <span>{item}</span>
@@ -1938,8 +2029,8 @@
 
           {/* Content */}
           {filtered.length === 0 ? (
-            <div className="bg-white rounded-3xl border border-slate-200 p-12 text-center shadow-sm">
-              <div className="w-16 h-16 mx-auto rounded-3xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4 shadow-sm">
+            <div className="glass-card rounded-[2.5rem] border border-slate-200 p-12 text-center shadow-sm">
+              <div className="w-16 h-16 mx-auto rounded-3xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4 shadow-sm animate-float">
                 <Icons.Recycle className="w-8 h-8" />
               </div>
               <h3 className="text-xl font-extrabold text-slate-800">No requests found</h3>
@@ -1961,7 +2052,7 @@
                 <button
                   type="button"
                   onClick={onNewRequest}
-                  className="inline-flex items-center px-5 py-2.5 rounded-xl bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-700 shadow-md shadow-emerald-600/20 transition active:scale-95"
+                  className="btn-shimmer inline-flex items-center px-6 py-3 rounded-2xl bg-emerald-600 text-white text-xs font-extrabold hover:bg-emerald-700 shadow-md shadow-emerald-600/25 transition active:scale-95"
                 >
                   <Icons.Plus className="w-4 h-4 mr-1.5" />
                   Schedule Your First Pickup
@@ -1969,23 +2060,22 @@
               </div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {filtered.map((item) => {
                 const badge = getCategoryBadge(item.category);
                 const isPendingOrScheduled = item.status === "Pending" || item.status === "Scheduled";
                 return (
                   <div 
                     key={item.id} 
-                    className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm hover:shadow-lg transition-all duration-200 flex flex-col justify-between"
+                    className="glass-card rounded-[2rem] border border-slate-200/80 p-6 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between"
                   >
                     <div>
-                      {/* Top Bar: ID + Status + Category */}
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center space-x-2">
-                          <span className="text-xs font-mono font-extrabold px-2.5 py-1 rounded-lg bg-slate-100 text-slate-800 border border-slate-200">
+                          <span className="text-xs font-mono font-extrabold px-3 py-1 rounded-xl bg-slate-100 text-slate-800 border border-slate-200 shadow-xs">
                             {item.id}
                           </span>
-                          <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold border ${badge.bg}`}>
+                          <span className={`inline-flex items-center px-2.5 py-1 rounded-xl text-xs font-bold border ${badge.bg}`}>
                             {badge.icon}
                             {item.category}
                           </span>
@@ -1993,12 +2083,11 @@
                         <StatusBadge status={item.status} />
                       </div>
 
-                      {/* Details list */}
-                      <div className="space-y-2.5 text-xs text-slate-600 bg-slate-50/70 p-4 rounded-2xl border border-slate-100">
+                      <div className="space-y-2.5 text-xs text-slate-600 bg-slate-50/80 p-4 rounded-2xl border border-slate-100">
                         <div className="flex items-center space-x-2.5">
                           <Icons.Calendar className="w-4 h-4 text-emerald-600 shrink-0" />
                           <span className="font-bold text-slate-800">Pickup Date:</span>
-                          <span className="font-semibold text-slate-700">{item.date}</span>
+                          <span className="font-extrabold text-slate-700">{item.date}</span>
                         </div>
 
                         <div className="flex items-start space-x-2.5">
@@ -2014,27 +2103,26 @@
                             <Icons.User className="w-4 h-4 text-emerald-600 shrink-0" />
                             <span className="font-bold text-slate-800">Contact:</span>
                             <span>{item.name} (+91 {item.phone})</span>
-                            <span className="text-[10px] text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded font-bold">Verified</span>
+                            <span className="text-[10px] text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded-full font-bold">Verified</span>
                           </div>
                         )}
 
                         {item.notes && item.notes !== "No extra notes provided." && (
-                          <div className="text-[11px] text-slate-500 pt-1 border-t border-slate-200/50 italic">
+                          <div className="text-[11px] text-slate-500 pt-1.5 border-t border-slate-200/50 italic">
                             "{item.notes}"
                           </div>
                         )}
                       </div>
                     </div>
 
-                    {/* Card Actions */}
                     <div className="mt-5 pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
                       <button
                         type="button"
                         onClick={() => onViewDetails(item)}
-                        className="inline-flex items-center px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-emerald-700 text-xs font-bold transition"
+                        className="inline-flex items-center px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-emerald-700 text-xs font-bold transition hover:scale-105 active:scale-95"
                         title="View live tracking status & printable ticket"
                       >
-                        <Icons.Eye className="w-3.5 h-3.5 mr-1 text-slate-500 group-hover:text-emerald-600" />
+                        <Icons.Eye className="w-3.5 h-3.5 mr-1.5 text-slate-500" />
                         Track &amp; Details
                       </button>
 
@@ -2043,7 +2131,7 @@
                           <button
                             type="button"
                             onClick={() => onCancelRequest(item.id)}
-                            className="inline-flex items-center px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold border border-rose-200 transition"
+                            className="inline-flex items-center px-3.5 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold border border-rose-200 transition hover:scale-105 active:scale-95"
                             title="Cancel this pickup request"
                           >
                             <Icons.XCircle className="w-3.5 h-3.5 mr-1 text-rose-600" />
@@ -2054,7 +2142,7 @@
                             <button
                               type="button"
                               onClick={() => onReorder(item)}
-                              className="inline-flex items-center px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold border border-emerald-200 transition"
+                              className="inline-flex items-center px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold border border-emerald-200 transition hover:scale-105 active:scale-95"
                               title="Book again with these details"
                             >
                               <Icons.Sparkles className="w-3.5 h-3.5 mr-1 text-emerald-600" />
@@ -2063,7 +2151,7 @@
                             <button
                               type="button"
                               onClick={() => onDeleteRequest(item.id)}
-                              className="p-1.5 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition"
+                              className="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition"
                               title="Delete record from list"
                             >
                               <Icons.Trash className="w-4 h-4" />
@@ -2094,7 +2182,6 @@
       const [showAddAddressModal, setShowAddAddressModal] = useState(false);
       const [editingAddress, setEditingAddress] = useState(null);
 
-      // Handle profile info update
       const handleSaveProfileInfo = (e) => {
         e.preventDefault();
         if (!profileForm.name.trim()) {
@@ -2111,7 +2198,6 @@
         onToast("Profile updated successfully!");
       };
 
-      // Set address as default
       const handleSetDefaultAddress = (addrId) => {
         const updatedAddrs = userProfile.savedAddresses.map(a => ({
           ...a,
@@ -2121,7 +2207,6 @@
         onToast("Default pickup address updated!");
       };
 
-      // Delete an address
       const handleDeleteAddress = (addrId) => {
         if (userProfile.savedAddresses.length <= 1) {
           onToast("You must keep at least one saved address.", "info");
@@ -2132,7 +2217,6 @@
         onToast("Address deleted.");
       };
 
-      // Add or Edit Address
       const handleSaveAddress = (addressData) => {
         let updatedAddrs;
         if (editingAddress) {
@@ -2156,42 +2240,39 @@
 
       return (
         <div className="space-y-8 max-w-4xl mx-auto">
-          {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <div className="flex items-center space-x-2">
-                <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold tracking-wider uppercase">
+                <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-extrabold tracking-wider uppercase shadow-sm">
                   User Account
                 </span>
                 <span className="text-xs text-slate-400">Authenticated Profile</span>
               </div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">Profile &amp; Settings</h2>
+              <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 mt-1">Profile &amp; Settings</h2>
               <p className="text-xs sm:text-sm text-slate-500">Manage authenticated mobile number, addresses, and recycling credentials</p>
             </div>
 
-            <div className="flex items-center space-x-3">
-              <button
-                type="button"
-                onClick={onSchedulePickup}
-                className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-600/20 transition active:scale-95 flex items-center"
-              >
-                <Icons.Plus className="w-3.5 h-3.5 mr-1.5" />
-                Book Pickup
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={onSchedulePickup}
+              className="btn-shimmer px-5 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shadow-lg shadow-emerald-600/25 transition active:scale-95 flex items-center hover:scale-105"
+            >
+              <Icons.Plus className="w-3.5 h-3.5 mr-1.5" />
+              Book Pickup
+            </button>
           </div>
 
           {/* Profile Overview Card */}
-          <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm">
+          <div className="glass-card rounded-[2.5rem] border border-slate-200 p-6 sm:p-10 shadow-sm hover:shadow-md transition">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-6 border-b border-slate-100">
               <div className="flex items-center space-x-4">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white font-extrabold text-2xl flex items-center justify-center shadow-lg shadow-emerald-600/20">
+                <div className="w-16 h-16 rounded-3xl bg-gradient-to-tr from-emerald-500 to-teal-700 text-white font-extrabold text-2xl flex items-center justify-center shadow-lg shadow-emerald-600/30 animate-float">
                   {userProfile.name.charAt(0)}
                 </div>
                 <div>
                   <div className="flex items-center space-x-2">
-                    <h3 className="text-xl font-extrabold text-slate-900">{userProfile.name}</h3>
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                    <h3 className="text-xl sm:text-2xl font-extrabold text-slate-900">{userProfile.name}</h3>
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
                       <Icons.ShieldCheck className="w-3.5 h-3.5 mr-1 text-emerald-600" />
                       Verified
                     </span>
@@ -2202,21 +2283,19 @@
                 </div>
               </div>
 
-              <div className="flex items-center space-x-3">
-                <button
-                  type="button"
-                  onClick={() => setIsEditingInfo(!isEditingInfo)}
-                  className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition flex items-center"
-                >
-                  <Icons.Edit className="w-3.5 h-3.5 mr-1.5 text-slate-600" />
-                  {isEditingInfo ? "Cancel Editing" : "Edit Profile"}
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={() => setIsEditingInfo(!isEditingInfo)}
+                className="px-4 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition flex items-center shadow-xs hover:scale-105 active:scale-95"
+              >
+                <Icons.Edit className="w-3.5 h-3.5 mr-1.5 text-slate-600" />
+                {isEditingInfo ? "Cancel Editing" : "Edit Profile"}
+              </button>
             </div>
 
-            {/* Inline Profile Info Edit Form */}
-            {isEditingInfo ? (
-              <form onSubmit={handleSaveProfileInfo} className="mt-6 p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-4">
+            {/* Inline Edit */}
+            {isEditingInfo && (
+              <form onSubmit={handleSaveProfileInfo} className="mt-6 p-5 bg-slate-50/80 rounded-3xl border border-slate-200 space-y-4 animate-fadeInUp">
                 <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider">Update Personal Details</h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
@@ -2225,7 +2304,7 @@
                       type="text"
                       value={profileForm.name}
                       onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })}
-                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500"
+                      className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-2xl text-xs focus:ring-2 focus:ring-emerald-500 shadow-sm"
                       required
                     />
                   </div>
@@ -2235,7 +2314,7 @@
                       type="email"
                       value={profileForm.email}
                       onChange={(e) => setProfileForm({ ...profileForm, email: e.target.value })}
-                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500"
+                      className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-2xl text-xs focus:ring-2 focus:ring-emerald-500 shadow-sm"
                       required
                     />
                   </div>
@@ -2244,30 +2323,30 @@
                   <button
                     type="button"
                     onClick={() => setIsEditingInfo(false)}
-                    className="px-3.5 py-1.5 text-xs text-slate-600 font-semibold hover:bg-slate-200 rounded-lg"
+                    className="px-4 py-2 text-xs text-slate-600 font-bold hover:bg-slate-200 rounded-xl"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-1.5 bg-emerald-600 text-white text-xs font-bold rounded-lg hover:bg-emerald-700 transition"
+                    className="px-5 py-2 bg-emerald-600 text-white text-xs font-extrabold rounded-xl hover:bg-emerald-700 transition shadow-sm"
                   >
                     Save Changes
                   </button>
                 </div>
               </form>
-            ) : null}
+            )}
 
             {/* Mobile Authentication Status Card */}
-            <div className="mt-6 p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center">
+            <div className="mt-6 p-5 rounded-3xl bg-emerald-50/70 border border-emerald-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm hover:shadow transition">
+              <div className="flex items-center space-x-3.5">
+                <div className="w-11 h-11 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-md shadow-emerald-600/30">
                   <Icons.Phone className="w-5 h-5" />
                 </div>
                 <div>
                   <div className="flex items-center space-x-2">
-                    <span className="font-extrabold text-slate-900 text-sm font-mono">+91 {userProfile.phone}</span>
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-200 text-emerald-900">
+                    <span className="font-extrabold text-slate-900 text-base font-mono">+91 {userProfile.phone}</span>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-200 text-emerald-900">
                       ✓ Authenticated
                     </span>
                   </div>
@@ -2278,49 +2357,49 @@
               <button
                 type="button"
                 onClick={() => onTriggerOtp(userProfile.phone, () => onToast("Phone re-verified successfully!"))}
-                className="px-3.5 py-2 bg-white border border-emerald-300 text-emerald-800 hover:bg-emerald-100 rounded-xl text-xs font-bold transition shadow-sm whitespace-nowrap"
+                className="px-4 py-2.5 bg-white border border-emerald-300 text-emerald-800 hover:bg-emerald-100 rounded-2xl text-xs font-bold transition shadow-sm whitespace-nowrap hover:scale-105 active:scale-95"
               >
                 Re-Verify via OTP
               </button>
             </div>
 
-            {/* Eco Impact Stats Scoreboard */}
+            {/* Eco Impact Stats */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 text-center">
-                <Icons.Recycle className="w-5 h-5 text-emerald-600 mx-auto mb-1" />
-                <div className="text-xl font-extrabold text-slate-900">{userProfile.totalRecycledKg} KG</div>
-                <div className="text-[11px] text-slate-500 font-medium">Recycled Waste</div>
+              <div className="p-4 rounded-3xl bg-slate-50/90 border border-slate-100 text-center hover:border-emerald-300 hover:shadow-md transition-all duration-300 hover:-translate-y-1">
+                <Icons.Recycle className="w-5 h-5 text-emerald-600 mx-auto mb-1 animate-spin-slow" />
+                <div className="text-2xl font-extrabold text-slate-900">{userProfile.totalRecycledKg} KG</div>
+                <div className="text-[11px] text-slate-500 font-bold">Recycled Waste</div>
               </div>
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 text-center">
-                <Icons.Award className="w-5 h-5 text-amber-500 mx-auto mb-1" />
-                <div className="text-xl font-extrabold text-amber-600">{userProfile.ecoPoints} Pts</div>
-                <div className="text-[11px] text-slate-500 font-medium">Eco-Reward Credits</div>
+              <div className="p-4 rounded-3xl bg-slate-50/90 border border-slate-100 text-center hover:border-amber-300 hover:shadow-md transition-all duration-300 hover:-translate-y-1">
+                <Icons.Award className="w-5 h-5 text-amber-500 mx-auto mb-1 animate-bounce" />
+                <div className="text-2xl font-extrabold text-amber-600">{userProfile.ecoPoints} Pts</div>
+                <div className="text-[11px] text-slate-500 font-bold">Eco-Reward Credits</div>
               </div>
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 text-center">
+              <div className="p-4 rounded-3xl bg-slate-50/90 border border-slate-100 text-center hover:border-sky-300 hover:shadow-md transition-all duration-300 hover:-translate-y-1">
                 <Icons.Truck className="w-5 h-5 text-sky-600 mx-auto mb-1" />
-                <div className="text-xl font-extrabold text-slate-900">5</div>
-                <div className="text-[11px] text-slate-500 font-medium">Completed Pickups</div>
+                <div className="text-2xl font-extrabold text-slate-900">5</div>
+                <div className="text-[11px] text-slate-500 font-bold">Completed Pickups</div>
               </div>
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 text-center">
-                <Icons.Leaf className="w-5 h-5 text-teal-600 mx-auto mb-1" />
-                <div className="text-xl font-extrabold text-teal-700">18.4 KG</div>
-                <div className="text-[11px] text-slate-500 font-medium">CO₂ Saved</div>
+              <div className="p-4 rounded-3xl bg-slate-50/90 border border-slate-100 text-center hover:border-teal-300 hover:shadow-md transition-all duration-300 hover:-translate-y-1">
+                <Icons.Leaf className="w-5 h-5 text-teal-600 mx-auto mb-1 animate-float" />
+                <div className="text-2xl font-extrabold text-teal-700">18.4 KG</div>
+                <div className="text-[11px] text-slate-500 font-bold">CO₂ Saved</div>
               </div>
             </div>
           </div>
 
           {/* Saved Addresses Manager */}
-          <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm">
+          <div className="glass-card rounded-[2.5rem] border border-slate-200 p-6 sm:p-10 shadow-sm">
             <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-6">
               <div>
-                <h3 className="text-lg font-extrabold text-slate-900">Saved Pickup Addresses</h3>
+                <h3 className="text-xl font-extrabold text-slate-900">Saved Pickup Addresses</h3>
                 <p className="text-xs text-slate-500 mt-0.5">Manage verified doorstep locations for fast 1-click scheduling</p>
               </div>
 
               <button
                 type="button"
                 onClick={() => { setEditingAddress(null); setShowAddAddressModal(true); }}
-                className="inline-flex items-center px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-600/20 transition active:scale-95"
+                className="btn-shimmer inline-flex items-center px-4 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shadow-md shadow-emerald-600/25 transition active:scale-95 hover:scale-105"
               >
                 <Icons.Plus className="w-3.5 h-3.5 mr-1.5" />
                 Add New Address
@@ -2331,8 +2410,8 @@
               {userProfile.savedAddresses.map((addr) => (
                 <div
                   key={addr.id}
-                  className={`p-5 rounded-2xl border transition-all duration-200 flex flex-col justify-between ${
-                    addr.isDefault ? "border-emerald-400 bg-emerald-50/20 shadow-sm" : "border-slate-200 bg-white"
+                  className={`p-5 rounded-3xl border transition-all duration-300 flex flex-col justify-between hover:shadow-lg hover:-translate-y-1 ${
+                    addr.isDefault ? "border-emerald-400 bg-emerald-50/30 shadow-sm" : "border-slate-200 bg-white"
                   }`}
                 >
                   <div>
@@ -2343,13 +2422,13 @@
                           {addr.label}
                         </span>
                         {addr.isDefault && (
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300">
                             Default
                           </span>
                         )}
                       </div>
                       {addr.isGpsVerified && (
-                        <span className="text-[11px] font-semibold text-emerald-700 flex items-center">
+                        <span className="text-[11px] font-bold text-emerald-700 flex items-center">
                           <Icons.Navigation className="w-3 h-3 mr-1" />
                           GPS Verified
                         </span>
@@ -2357,7 +2436,7 @@
                     </div>
 
                     <div className="text-xs text-slate-600 space-y-1 mt-2">
-                      <p className="font-semibold text-slate-800">{addr.flat}</p>
+                      <p className="font-bold text-slate-800">{addr.flat}</p>
                       <p>{addr.street}</p>
                       {addr.landmark && <p className="text-slate-400 italic">Landmark: {addr.landmark}</p>}
                       <p className="font-semibold text-slate-700">{addr.city}, {addr.state} - {addr.pincode}</p>
@@ -2369,19 +2448,19 @@
                       <button
                         type="button"
                         onClick={() => handleSetDefaultAddress(addr.id)}
-                        className="text-emerald-700 hover:text-emerald-900 font-bold hover:underline"
+                        className="text-emerald-700 hover:text-emerald-900 font-extrabold hover:underline"
                       >
                         Set as Default
                       </button>
                     ) : (
-                      <span className="text-emerald-700 font-semibold text-[11px]">Primary Address</span>
+                      <span className="text-emerald-700 font-bold text-[11px]">Primary Address</span>
                     )}
 
                     <div className="flex items-center space-x-2">
                       <button
                         type="button"
                         onClick={() => { setEditingAddress(addr); setShowAddAddressModal(true); }}
-                        className="p-1.5 text-slate-500 hover:text-emerald-700 hover:bg-slate-100 rounded-lg transition"
+                        className="p-2 text-slate-500 hover:text-emerald-700 hover:bg-slate-100 rounded-xl transition"
                         title="Edit Address"
                       >
                         <Icons.Edit className="w-4 h-4" />
@@ -2389,7 +2468,7 @@
                       <button
                         type="button"
                         onClick={() => handleDeleteAddress(addr.id)}
-                        className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition"
+                        className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition"
                         title="Delete Address"
                       >
                         <Icons.Trash className="w-4 h-4" />
@@ -2414,7 +2493,7 @@
     }
 
     // ==========================================
-    // ADDRESS MODAL COMPONENT
+    // ADDRESS MODAL COMPONENT WITH ANIMATION
     // ==========================================
     function AddressModal({ initialData, onSave, onClose }) {
       const [form, setForm] = useState({
@@ -2450,12 +2529,12 @@
       const states = ["California", "New York", "Texas", "Illinois", "Florida", "Washington", "Massachusetts", "Georgia", "Other"];
 
       return (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-200 relative">
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeInUp">
+          <div className="bg-white rounded-[2.5rem] max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-200 relative animate-popIn">
             <button
               type="button"
               onClick={onClose}
-              className="absolute top-6 right-6 text-slate-400 hover:text-slate-700 p-1 rounded-xl"
+              className="absolute top-6 right-6 text-slate-400 hover:text-slate-700 p-1.5 rounded-xl hover:bg-slate-100 transition"
             >
               <Icons.X className="w-5 h-5" />
             </button>
@@ -2463,10 +2542,9 @@
             <h3 className="text-xl font-extrabold text-slate-900 mb-1">
               {initialData ? "Edit Address" : "Add New Address"}
             </h3>
-            <p className="text-xs text-slate-500 mb-4">Validate address for swift doorstep collections</p>
+            <p className="text-xs text-slate-500 mb-5">Validate address for swift doorstep collections</p>
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Label */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">Address Label</label>
                 <div className="flex space-x-2">
@@ -2475,10 +2553,10 @@
                       key={lbl}
                       type="button"
                       onClick={() => setForm({ ...form, label: lbl })}
-                      className={`flex-1 py-1.5 rounded-xl text-xs font-bold border transition ${
+                      className={`flex-1 py-2 rounded-2xl text-xs font-bold border transition ${
                         form.label === lbl
-                          ? "bg-emerald-600 text-white border-emerald-600 shadow-sm"
-                          : "bg-slate-50 text-slate-600 border-slate-200"
+                          ? "bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-600/25"
+                          : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
                       }`}
                     >
                       {lbl}
@@ -2487,7 +2565,6 @@
                 </div>
               </div>
 
-              {/* Flat */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">House / Flat / Floor *</label>
                 <input
@@ -2495,12 +2572,11 @@
                   value={form.flat}
                   onChange={(e) => setForm({ ...form, flat: e.target.value })}
                   placeholder="e.g. Flat 301, Building B"
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs focus:ring-2 focus:ring-emerald-500 shadow-sm"
                 />
                 {errors.flat && <p className="text-rose-500 text-[11px] mt-1">{errors.flat}</p>}
               </div>
 
-              {/* Street */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">Street / Colony *</label>
                 <input
@@ -2508,12 +2584,11 @@
                   value={form.street}
                   onChange={(e) => setForm({ ...form, street: e.target.value })}
                   placeholder="e.g. 100 Sunset Blvd"
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs focus:ring-2 focus:ring-emerald-500 shadow-sm"
                 />
                 {errors.street && <p className="text-rose-500 text-[11px] mt-1">{errors.street}</p>}
               </div>
 
-              {/* Landmark */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">Landmark (Optional)</label>
                 <input
@@ -2521,11 +2596,10 @@
                   value={form.landmark}
                   onChange={(e) => setForm({ ...form, landmark: e.target.value })}
                   placeholder="e.g. Near Metro gate 2"
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs focus:ring-2 focus:ring-emerald-500 shadow-sm"
                 />
               </div>
 
-              {/* City & PIN */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">City *</label>
@@ -2534,7 +2608,7 @@
                     value={form.city}
                     onChange={(e) => setForm({ ...form, city: e.target.value })}
                     placeholder="e.g. Springfield"
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs focus:ring-2 focus:ring-emerald-500 shadow-sm"
                   />
                   {errors.city && <p className="text-rose-500 text-[11px] mt-1">{errors.city}</p>}
                 </div>
@@ -2546,19 +2620,18 @@
                     value={form.pincode}
                     onChange={(e) => setForm({ ...form, pincode: e.target.value.replace(/\D/g, "") })}
                     placeholder="97477"
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold focus:ring-2 focus:ring-emerald-500"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-mono font-bold focus:ring-2 focus:ring-emerald-500 shadow-sm"
                   />
                   {errors.pincode && <p className="text-rose-500 text-[11px] mt-1">{errors.pincode}</p>}
                 </div>
               </div>
 
-              {/* State */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">State</label>
                 <select
                   value={form.state}
                   onChange={(e) => setForm({ ...form, state: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs cursor-pointer"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs cursor-pointer shadow-sm"
                 >
                   {states.map(s => <option key={s} value={s}>{s}</option>)}
                 </select>
@@ -2568,13 +2641,13 @@
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl"
+                  className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md transition"
+                  className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold rounded-2xl shadow-md shadow-emerald-600/25 transition"
                 >
                   Save Address
                 </button>
@@ -2586,7 +2659,7 @@
     }
 
     // ==========================================
-    // OTP VERIFICATION MODAL
+    // OTP VERIFICATION MODAL WITH ANIMATION
     // ==========================================
     function OtpVerificationModal({ phone, expectedOtp, onVerify, onResend, onClose }) {
       const [otpInput, setOtpInput] = useState("");
@@ -2610,18 +2683,18 @@
       };
 
       return (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-sm w-full p-6 sm:p-8 shadow-2xl border border-slate-200 relative text-center">
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeInUp">
+          <div className="bg-white rounded-[2.5rem] max-w-sm w-full p-6 sm:p-8 shadow-2xl border border-slate-200 relative text-center animate-popIn">
             <button
               type="button"
               onClick={onClose}
-              className="absolute top-6 right-6 text-slate-400 hover:text-slate-700 p-1 rounded-xl"
+              className="absolute top-6 right-6 text-slate-400 hover:text-slate-700 p-1.5 rounded-xl hover:bg-slate-100 transition"
             >
               <Icons.X className="w-5 h-5" />
             </button>
 
-            <div className="w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto mb-4 shadow-sm">
-              <Icons.Key className="w-7 h-7" />
+            <div className="w-16 h-16 rounded-3xl bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto mb-4 shadow-md shadow-emerald-500/20 animate-float">
+              <Icons.Key className="w-8 h-8" />
             </div>
 
             <h3 className="text-xl font-extrabold text-slate-900">Verify Mobile Number</h3>
@@ -2630,18 +2703,18 @@
             </p>
 
             {/* Demo Helper Banner with 1-Click Fill */}
-            <div className="my-4 p-3 bg-emerald-50 rounded-2xl border border-emerald-200 text-xs text-emerald-900">
-              <span className="font-semibold block mb-1">🔑 Demo Verification Code:</span>
-              <span className="font-mono text-lg font-extrabold tracking-widest bg-white px-3 py-1 rounded-lg border border-emerald-300 inline-block shadow-sm">
+            <div className="my-4 p-4 bg-emerald-50/80 rounded-2xl border border-emerald-200 text-xs text-emerald-900 shadow-sm">
+              <span className="font-bold block mb-1">🔑 Demo Verification Code:</span>
+              <span className="font-mono text-2xl font-extrabold tracking-widest bg-white px-4 py-1 rounded-xl border border-emerald-300 inline-block shadow-sm text-emerald-800 animate-pulse">
                 {expectedOtp}
               </span>
-              <div className="mt-2">
+              <div className="mt-2.5">
                 <button
                   type="button"
                   onClick={() => { setOtpInput(expectedOtp); setError(""); }}
-                  className="text-emerald-700 hover:text-emerald-800 underline font-bold"
+                  className="text-emerald-700 hover:text-emerald-900 underline font-extrabold hover:scale-105 transition"
                 >
-                  Click here to auto-fill code
+                  ⚡ Click here to auto-fill code
                 </button>
               </div>
             </div>
@@ -2654,27 +2727,27 @@
                   value={otpInput}
                   onChange={(e) => { setOtpInput(e.target.value.replace(/\D/g, "")); setError(""); }}
                   placeholder="• • • •"
-                  className="w-36 mx-auto text-center font-mono text-2xl font-bold tracking-widest px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-40 mx-auto text-center font-mono text-2xl font-extrabold tracking-widest px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-emerald-500/20 shadow-sm"
                   autoFocus
                 />
-                {error && <p className="text-rose-500 text-[11px] mt-1.5">{error}</p>}
+                {error && <p className="text-rose-500 text-[11px] mt-1.5 font-bold">{error}</p>}
               </div>
 
               <button
                 type="submit"
-                className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-600/20 transition active:scale-95 cursor-pointer"
+                className="btn-shimmer w-full py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shadow-lg shadow-emerald-600/30 transition active:scale-95 cursor-pointer hover:-translate-y-0.5"
               >
                 Confirm &amp; Verify Mobile
               </button>
 
               <div className="text-[11px] text-slate-400">
                 {timer > 0 ? (
-                  <span>Resend code in {timer}s</span>
+                  <span>Resend code in <span className="font-bold text-slate-600">{timer}s</span></span>
                 ) : (
                   <button
                     type="button"
                     onClick={() => { onResend(); setTimer(25); }}
-                    className="text-emerald-700 font-bold hover:underline"
+                    className="text-emerald-700 font-extrabold hover:underline"
                   >
                     Resend OTP Code
                   </button>
@@ -2687,7 +2760,7 @@
     }
 
     // ==========================================
-    // PAGE 5: ADMIN DASHBOARD
+    // PAGE 5: ADMIN DASHBOARD WITH ANIMATIONS
     // ==========================================
     function AdminDashboardPage({
       requests,
@@ -2720,25 +2793,23 @@
 
       return (
         <div className="space-y-8">
-          {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <div className="flex items-center space-x-2">
-                <span className="px-3 py-1 rounded-full bg-slate-900 text-white text-xs font-extrabold tracking-wider uppercase shadow-sm">
+                <span className="px-3.5 py-1 rounded-full bg-slate-900 text-white text-xs font-extrabold tracking-wider uppercase shadow-md">
                   Admin Command Center
                 </span>
                 <span className="text-xs text-slate-400">Live localStorage Sync</span>
               </div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">Admin Dashboard</h2>
+              <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 mt-1">Admin Dashboard</h2>
               <p className="text-xs sm:text-sm text-slate-500">Manage route schedules, dispatch drivers, and update status</p>
             </div>
 
-            {/* Top Toolbar Action Buttons */}
             <div className="flex flex-wrap items-center gap-2.5">
               <button
                 type="button"
                 onClick={onOpenNewPickup}
-                className="inline-flex items-center px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md shadow-emerald-600/20 transition active:scale-95"
+                className="btn-shimmer inline-flex items-center px-4 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold shadow-md shadow-emerald-600/25 transition active:scale-95 hover:scale-105"
                 title="Create a pickup request from Admin"
               >
                 <Icons.Plus className="w-3.5 h-3.5 mr-1.5" />
@@ -2748,7 +2819,7 @@
               <button
                 type="button"
                 onClick={onExportCSV}
-                className="inline-flex items-center px-3.5 py-2 rounded-xl bg-white border border-slate-300 text-slate-700 text-xs font-bold hover:bg-slate-50 transition shadow-sm active:scale-95"
+                className="inline-flex items-center px-4 py-2.5 rounded-2xl bg-white border border-slate-300 text-slate-700 text-xs font-bold hover:bg-slate-50 transition shadow-sm active:scale-95 hover:scale-105"
                 title="Download all pickup records as CSV spreadsheet"
               >
                 <Icons.Download className="w-3.5 h-3.5 mr-1.5 text-slate-500" />
@@ -2758,7 +2829,7 @@
               <button
                 type="button"
                 onClick={onResetSampleData}
-                className="inline-flex items-center px-3 py-2 rounded-xl bg-white border border-slate-300 text-slate-700 text-xs font-bold hover:bg-slate-50 transition shadow-sm active:scale-95"
+                className="inline-flex items-center px-3.5 py-2.5 rounded-2xl bg-white border border-slate-300 text-slate-700 text-xs font-bold hover:bg-slate-50 transition shadow-sm active:scale-95"
                 title="Reset back to standard sample items"
               >
                 <Icons.Recycle className="w-3.5 h-3.5 mr-1.5 text-slate-500" />
@@ -2768,7 +2839,7 @@
               <button
                 type="button"
                 onClick={onClearCompleted}
-                className="inline-flex items-center px-3 py-2 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-700 text-xs font-bold border border-slate-200 transition active:scale-95"
+                className="inline-flex items-center px-3.5 py-2.5 rounded-2xl bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-700 text-xs font-bold border border-slate-200 transition active:scale-95"
                 title="Purge completed & cancelled records"
               >
                 <Icons.Trash className="w-3.5 h-3.5 mr-1 text-slate-500 hover:text-rose-600" />
@@ -2777,22 +2848,22 @@
             </div>
           </div>
 
-          {/* Clickable Metric Summary Cards */}
+          {/* Clickable Metric Summary Cards with Hover Lift */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <button
               type="button"
               onClick={() => setStatusFilter("All")}
-              className={`p-5 rounded-3xl border text-left transition transform hover:-translate-y-0.5 cursor-pointer ${
+              className={`p-5 rounded-3xl border text-left transition-all duration-300 transform hover:-translate-y-1.5 cursor-pointer shadow-sm ${
                 statusFilter === "All"
-                  ? "bg-slate-900 text-white border-slate-900 shadow-lg"
-                  : "bg-white text-slate-800 border-slate-200 hover:border-slate-400 shadow-sm"
+                  ? "bg-slate-900 text-white border-slate-900 shadow-xl scale-102"
+                  : "glass-card text-slate-800 border-slate-200 hover:border-slate-400"
               }`}
             >
               <div className="flex items-center justify-between mb-2">
                 <span className={`text-xs font-extrabold uppercase tracking-wider ${statusFilter === "All" ? "text-slate-300" : "text-slate-500"}`}>
                   Total
                 </span>
-                <Icons.Recycle className={`w-5 h-5 ${statusFilter === "All" ? "text-emerald-400" : "text-slate-600"}`} />
+                <Icons.Recycle className={`w-5 h-5 ${statusFilter === "All" ? "text-emerald-400" : "text-slate-600"} animate-spin-slow`} />
               </div>
               <h3 className="text-3xl font-extrabold">{totalRequests}</h3>
               <span className={`text-[11px] mt-1 inline-block ${statusFilter === "All" ? "text-slate-400" : "text-slate-400"}`}>
@@ -2803,10 +2874,10 @@
             <button
               type="button"
               onClick={() => setStatusFilter("Pending")}
-              className={`p-5 rounded-3xl border text-left transition transform hover:-translate-y-0.5 cursor-pointer ${
+              className={`p-5 rounded-3xl border text-left transition-all duration-300 transform hover:-translate-y-1.5 cursor-pointer shadow-sm ${
                 statusFilter === "Pending"
-                  ? "bg-amber-600 text-white border-amber-600 shadow-lg"
-                  : "bg-white text-slate-800 border-amber-200 hover:border-amber-400 shadow-sm"
+                  ? "bg-amber-600 text-white border-amber-600 shadow-xl scale-102"
+                  : "glass-card text-slate-800 border-amber-200 hover:border-amber-400"
               }`}
             >
               <div className="flex items-center justify-between mb-2">
@@ -2824,10 +2895,10 @@
             <button
               type="button"
               onClick={() => setStatusFilter("Scheduled")}
-              className={`p-5 rounded-3xl border text-left transition transform hover:-translate-y-0.5 cursor-pointer ${
+              className={`p-5 rounded-3xl border text-left transition-all duration-300 transform hover:-translate-y-1.5 cursor-pointer shadow-sm ${
                 statusFilter === "Scheduled"
-                  ? "bg-sky-600 text-white border-sky-600 shadow-lg"
-                  : "bg-white text-slate-800 border-sky-200 hover:border-sky-400 shadow-sm"
+                  ? "bg-sky-600 text-white border-sky-600 shadow-xl scale-102"
+                  : "glass-card text-slate-800 border-sky-200 hover:border-sky-400"
               }`}
             >
               <div className="flex items-center justify-between mb-2">
@@ -2845,10 +2916,10 @@
             <button
               type="button"
               onClick={() => setStatusFilter("Completed")}
-              className={`p-5 rounded-3xl border text-left transition transform hover:-translate-y-0.5 cursor-pointer ${
+              className={`p-5 rounded-3xl border text-left transition-all duration-300 transform hover:-translate-y-1.5 cursor-pointer shadow-sm ${
                 statusFilter === "Completed"
-                  ? "bg-emerald-600 text-white border-emerald-600 shadow-lg"
-                  : "bg-white text-slate-800 border-emerald-200 hover:border-emerald-400 shadow-sm"
+                  ? "bg-emerald-600 text-white border-emerald-600 shadow-xl scale-102"
+                  : "glass-card text-slate-800 border-emerald-200 hover:border-emerald-400"
               }`}
             >
               <div className="flex items-center justify-between mb-2">
@@ -2865,19 +2936,17 @@
           </div>
 
           {/* Table Container */}
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-            {/* Filter and Search Bar */}
-            <div className="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-50/50">
-              {/* Filter tabs */}
+          <div className="glass-card rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden">
+            <div className="p-5 border-b border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-50/50">
               <div className="flex items-center space-x-1.5 overflow-x-auto w-full sm:w-auto">
                 {["All", "Pending", "Scheduled", "Completed", "Cancelled"].map((status) => (
                   <button
                     key={status}
                     type="button"
                     onClick={() => setStatusFilter(status)}
-                    className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition ${
+                    className={`px-4 py-2 rounded-2xl text-xs font-extrabold transition-all duration-200 ${
                       statusFilter === status
-                        ? "bg-emerald-600 text-white shadow-sm"
+                        ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/30 scale-105"
                         : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-100"
                     }`}
                   >
@@ -2887,20 +2956,19 @@
                 ))}
               </div>
 
-              {/* Search input with clear button */}
               <div className="w-full sm:w-72 relative">
                 <input
                   type="text"
                   placeholder="Search ID, customer, phone, city..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-3 pr-8 py-2 text-xs bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm"
+                  className="w-full pl-3 pr-8 py-2 text-xs bg-white border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm"
                 />
                 {searchQuery && (
                   <button
                     type="button"
                     onClick={() => setSearchQuery("")}
-                    className="absolute inset-y-0 right-0 pr-2.5 flex items-center text-slate-400 hover:text-slate-600"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
                     title="Clear search"
                   >
                     <Icons.X className="w-3.5 h-3.5" />
@@ -2913,34 +2981,33 @@
             <div className="overflow-x-auto custom-scrollbar">
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
-                  <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 font-extrabold uppercase tracking-wider">
-                    <th className="py-3.5 px-4">Request ID</th>
-                    <th className="py-3.5 px-4">Requester</th>
-                    <th className="py-3.5 px-4">Waste Type</th>
-                    <th className="py-3.5 px-4">Pickup Date</th>
-                    <th className="py-3.5 px-4">Address</th>
-                    <th className="py-3.5 px-4">Current Status</th>
-                    <th className="py-3.5 px-4 text-center">Change Status</th>
-                    <th className="py-3.5 px-4 text-right">Actions</th>
+                  <tr className="bg-slate-50/80 border-b border-slate-200 text-slate-600 font-extrabold uppercase tracking-wider">
+                    <th className="py-4 px-4">Request ID</th>
+                    <th className="py-4 px-4">Requester</th>
+                    <th className="py-4 px-4">Waste Type</th>
+                    <th className="py-4 px-4">Pickup Date</th>
+                    <th className="py-4 px-4">Address</th>
+                    <th className="py-4 px-4">Current Status</th>
+                    <th className="py-4 px-4 text-center">Change Status</th>
+                    <th className="py-4 px-4 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {filteredRequests.length === 0 ? (
                     <tr>
                       <td colSpan="8" className="py-12 text-center text-slate-400">
-                        <div className="w-12 h-12 mx-auto rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mb-3">
+                        <div className="w-12 h-12 mx-auto rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mb-3 animate-float">
                           <Icons.Recycle className="w-6 h-6" />
                         </div>
-                        <p className="font-semibold text-slate-600">No pickup requests match your criteria.</p>
+                        <p className="font-bold text-slate-600">No pickup requests match your criteria.</p>
                       </td>
                     </tr>
                   ) : (
                     filteredRequests.map((req) => {
                       const badge = getCategoryBadge(req.category);
                       return (
-                        <tr key={req.id} className="hover:bg-slate-50/80 transition">
-                          {/* Request ID */}
-                          <td className="py-3.5 px-4 font-mono font-bold text-slate-800">
+                        <tr key={req.id} className="hover:bg-slate-50/80 transition-colors">
+                          <td className="py-4 px-4 font-mono font-bold text-slate-800">
                             <button
                               type="button"
                               onClick={() => onViewDetails(req)}
@@ -2951,41 +3018,35 @@
                             </button>
                           </td>
 
-                          {/* Requester */}
-                          <td className="py-3.5 px-4">
+                          <td className="py-4 px-4">
                             <div className="font-bold text-slate-900">{req.name}</div>
                             <div className="text-[11px] text-slate-500 font-mono">+91 {req.phone}</div>
                           </td>
 
-                          {/* Waste Type */}
-                          <td className="py-3.5 px-4">
-                            <span className={`inline-flex items-center px-2 py-0.5 rounded-md font-bold text-[11px] border ${badge.bg}`}>
+                          <td className="py-4 px-4">
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-xl font-bold text-[11px] border ${badge.bg}`}>
                               {badge.icon}
                               {req.category}
                             </span>
                           </td>
 
-                          {/* Pickup Date */}
-                          <td className="py-3.5 px-4 text-slate-700 font-semibold whitespace-nowrap">
+                          <td className="py-4 px-4 text-slate-700 font-bold whitespace-nowrap">
                             {req.date}
                           </td>
 
-                          {/* Address */}
-                          <td className="py-3.5 px-4 max-w-xs truncate text-slate-600" title={req.address}>
+                          <td className="py-4 px-4 max-w-xs truncate text-slate-600" title={req.address}>
                             {req.address}
                           </td>
 
-                          {/* Current Status */}
-                          <td className="py-3.5 px-4 whitespace-nowrap">
+                          <td className="py-4 px-4 whitespace-nowrap">
                             <StatusBadge status={req.status} />
                           </td>
 
-                          {/* Change Status Dropdown */}
-                          <td className="py-3.5 px-4 text-center">
+                          <td className="py-4 px-4 text-center">
                             <select
                               value={req.status}
                               onChange={(e) => onStatusChange(req.id, e.target.value)}
-                              className="px-2.5 py-1.5 rounded-xl border border-slate-300 text-xs font-bold bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm cursor-pointer hover:border-emerald-500 transition"
+                              className="px-3 py-1.5 rounded-xl border border-slate-300 text-xs font-bold bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm cursor-pointer hover:border-emerald-500 transition"
                             >
                               <option value="Pending">Pending</option>
                               <option value="Scheduled">Scheduled</option>
@@ -2994,13 +3055,12 @@
                             </select>
                           </td>
 
-                          {/* Row Action Buttons */}
-                          <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                          <td className="py-4 px-4 text-right whitespace-nowrap">
                             <div className="flex items-center justify-end space-x-1.5">
                               <button
                                 type="button"
                                 onClick={() => onViewDetails(req)}
-                                className="p-1.5 rounded-lg text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 transition"
+                                className="p-2 rounded-xl text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 transition hover:scale-110"
                                 title="View Details"
                               >
                                 <Icons.Eye className="w-4 h-4" />
@@ -3010,7 +3070,7 @@
                                 <button
                                   type="button"
                                   onClick={() => onStatusChange(req.id, "Scheduled")}
-                                  className="px-2 py-1 rounded-lg bg-sky-50 text-sky-700 hover:bg-sky-100 font-bold text-[11px] border border-sky-200 transition"
+                                  className="px-2.5 py-1 rounded-xl bg-sky-50 text-sky-700 hover:bg-sky-100 font-bold text-[11px] border border-sky-200 transition active:scale-95"
                                 >
                                   Schedule
                                 </button>
@@ -3020,7 +3080,7 @@
                                 <button
                                   type="button"
                                   onClick={() => onStatusChange(req.id, "Completed")}
-                                  className="px-2 py-1 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-bold text-[11px] border border-emerald-200 transition"
+                                  className="px-2.5 py-1 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-bold text-[11px] border border-emerald-200 transition active:scale-95"
                                 >
                                   Complete
                                 </button>
@@ -3029,7 +3089,7 @@
                               <button
                                 type="button"
                                 onClick={() => onDeleteRequest(req.id)}
-                                className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition"
+                                className="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition"
                                 title="Delete request"
                               >
                                 <Icons.Trash className="w-4 h-4" />
@@ -3044,11 +3104,10 @@
               </table>
             </div>
 
-            {/* Table Footer */}
             <div className="p-4 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
               <span>Showing {filteredRequests.length} of {requests.length} total entries</span>
-              <span className="text-emerald-700 font-semibold flex items-center">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 mr-2"></span>
+              <span className="text-emerald-700 font-bold flex items-center">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 mr-2 animate-ping"></span>
                 Changes persist automatically in browser localStorage
               </span>
             </div>
@@ -3072,43 +3131,42 @@
       ];
 
       return (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-200 relative printable-modal">
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeInUp">
+          <div className="bg-white rounded-[2.5rem] max-w-lg w-full p-6 sm:p-9 shadow-2xl border border-slate-200 relative printable-modal animate-popIn">
             <button
               type="button"
               onClick={onClose}
-              className="absolute top-6 right-6 text-slate-400 hover:text-slate-700 p-1 rounded-xl hover:bg-slate-100 transition no-print focus:outline-none"
+              className="absolute top-6 right-6 text-slate-400 hover:text-slate-700 p-2 rounded-2xl hover:bg-slate-100 transition no-print focus:outline-none"
               title="Close modal"
             >
               <Icons.X className="w-5 h-5" />
             </button>
 
-            {/* Modal Header */}
             <div className="mb-6 pb-4 border-b border-slate-100">
               <div className="flex items-center space-x-2 mb-1">
-                <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-800">
+                <span className="text-xs font-mono font-extrabold px-3 py-1 rounded-xl bg-slate-100 text-slate-800">
                   {request.id}
                 </span>
                 <StatusBadge status={request.status} />
               </div>
-              <h3 className="text-xl font-extrabold text-slate-900">Waste Pickup Details</h3>
+              <h3 className="text-2xl font-extrabold text-slate-900">Waste Pickup Details</h3>
               <p className="text-xs text-slate-500">Scheduled doorstep collection &amp; segregation tracking</p>
             </div>
 
-            {/* Stepper */}
+            {/* Stepper with Glowing Rings */}
             {request.status !== "Cancelled" ? (
-              <div className="mb-6 bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">Live Pickup Progress</h4>
-                <div className="space-y-3">
+              <div className="mb-6 bg-slate-50/90 p-5 rounded-3xl border border-slate-100 shadow-sm">
+                <h4 className="text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-4">Live Pickup Progress</h4>
+                <div className="space-y-4">
                   {steps.map((st, i) => (
-                    <div key={i} className="flex items-start space-x-3 text-xs">
-                      <div className={`w-5 h-5 rounded-full flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5 ${
-                        st.done ? "bg-emerald-600 text-white" : "bg-slate-200 text-slate-500"
+                    <div key={i} className="flex items-start space-x-3.5 text-xs">
+                      <div className={`w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs shrink-0 mt-0.5 transition-all duration-300 ${
+                        st.done ? "bg-emerald-600 text-white shadow-md shadow-emerald-500/30" : "bg-slate-200 text-slate-500"
                       }`}>
                         {st.done ? "✓" : i + 1}
                       </div>
                       <div>
-                        <p className={`font-bold ${st.done ? "text-slate-900" : "text-slate-400"}`}>{st.label}</p>
+                        <p className={`font-extrabold text-sm ${st.done ? "text-slate-900" : "text-slate-400"}`}>{st.label}</p>
                         <p className="text-[11px] text-slate-500">{st.desc}</p>
                       </div>
                     </div>
@@ -3116,20 +3174,19 @@
                 </div>
               </div>
             ) : (
-              <div className="mb-6 bg-rose-50 p-4 rounded-2xl border border-rose-200 text-xs text-rose-800 flex items-center space-x-3">
-                <Icons.XCircle className="w-6 h-6 text-rose-600 shrink-0" />
+              <div className="mb-6 bg-rose-50 p-5 rounded-3xl border border-rose-200 text-xs text-rose-800 flex items-center space-x-3.5">
+                <Icons.XCircle className="w-7 h-7 text-rose-600 shrink-0" />
                 <div>
-                  <p className="font-bold">This pickup request was Cancelled</p>
-                  <p className="text-[11px] text-rose-600">You can reschedule or submit a new pickup request anytime.</p>
+                  <p className="font-extrabold text-sm">This pickup request was Cancelled</p>
+                  <p className="text-[11px] text-rose-600 mt-0.5">You can reschedule or submit a new pickup request anytime.</p>
                 </div>
               </div>
             )}
 
-            {/* Details */}
-            <div className="space-y-3 text-xs bg-slate-50/70 p-4 rounded-2xl border border-slate-100 mb-6">
+            <div className="space-y-3 text-xs bg-slate-50/70 p-5 rounded-3xl border border-slate-100 mb-6">
               <div className="flex items-center justify-between">
                 <span className="text-slate-500">Waste Category:</span>
-                <span className={`inline-flex items-center px-2 py-0.5 rounded font-bold border ${badge.bg}`}>
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-xl font-bold border ${badge.bg}`}>
                   {badge.icon}
                   {request.category}
                 </span>
@@ -3142,7 +3199,7 @@
                 <span className="text-slate-500">Authenticated Mobile:</span>
                 <span className="font-bold text-emerald-700 flex items-center font-mono">
                   +91 {request.phone}
-                  <span className="ml-1.5 text-[10px] bg-emerald-100 text-emerald-800 px-1 rounded">✓ Verified</span>
+                  <span className="ml-1.5 text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded-full">✓ Verified</span>
                 </span>
               </div>
               <div className="flex items-center justify-between">
@@ -3161,13 +3218,12 @@
               )}
             </div>
 
-            {/* Modal Bottom Buttons */}
             <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100 no-print">
               <div className="flex items-center space-x-2">
                 <button
                   type="button"
                   onClick={() => window.print()}
-                  className="inline-flex items-center px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition"
+                  className="inline-flex items-center px-4 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition shadow-xs hover:scale-105 active:scale-95"
                   title="Print collection receipt or pass"
                 >
                   <Icons.Printer className="w-3.5 h-3.5 mr-1.5 text-slate-600" />
@@ -3178,7 +3234,7 @@
                   <button
                     type="button"
                     onClick={() => onCancelRequest(request.id)}
-                    className="inline-flex items-center px-3 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold border border-rose-200 transition"
+                    className="inline-flex items-center px-4 py-2.5 rounded-2xl bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold border border-rose-200 transition hover:scale-105 active:scale-95"
                   >
                     Cancel Request
                   </button>
@@ -3190,7 +3246,7 @@
                   <button
                     type="button"
                     onClick={() => onDeleteRequest(request.id)}
-                    className="p-2 text-rose-600 hover:bg-rose-50 rounded-xl transition"
+                    className="p-2.5 text-rose-600 hover:bg-rose-50 rounded-2xl transition"
                     title="Delete record"
                   >
                     <Icons.Trash className="w-4 h-4" />
@@ -3200,7 +3256,7 @@
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-5 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition"
+                  className="px-6 py-2.5 rounded-2xl bg-slate-900 text-white text-xs font-extrabold hover:bg-slate-800 transition shadow-md active:scale-95"
                 >
                   Close
                 </button>
@@ -3216,42 +3272,42 @@
     // ==========================================
     function InfoModal({ onClose }) {
       return (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-200 relative">
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeInUp">
+          <div className="bg-white rounded-[2.5rem] max-w-lg w-full p-6 sm:p-9 shadow-2xl border border-slate-200 relative animate-popIn">
             <button
               type="button"
               onClick={onClose}
-              className="absolute top-6 right-6 text-slate-400 hover:text-slate-700 p-1 rounded-xl hover:bg-slate-100 transition focus:outline-none"
+              className="absolute top-6 right-6 text-slate-400 hover:text-slate-700 p-2 rounded-2xl hover:bg-slate-100 transition focus:outline-none"
             >
               <Icons.X className="w-5 h-5" />
             </button>
 
             <div className="mb-6 pb-4 border-b border-slate-100">
-              <div className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold mb-1">
+              <div className="inline-flex items-center px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-extrabold mb-1 shadow-xs">
                 EcoCollect FAQ &amp; Guidelines
               </div>
-              <h3 className="text-xl font-extrabold text-slate-900">How It Works</h3>
+              <h3 className="text-2xl font-extrabold text-slate-900">How It Works</h3>
               <p className="text-xs text-slate-500">Everything you need to know about doorstep waste collection</p>
             </div>
 
             <div className="space-y-4 text-xs text-slate-600 max-h-96 overflow-y-auto custom-scrollbar pr-1">
-              <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100">
-                <h5 className="font-bold text-slate-900 mb-1">How does mobile authentication work?</h5>
+              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:border-emerald-200 transition">
+                <h5 className="font-extrabold text-slate-900 mb-1">How does mobile authentication work?</h5>
                 <p>When booking or saving your profile, enter your 10-digit mobile number and click "Verify OTP". A 4-digit code will be sent to confirm your identity.</p>
               </div>
 
-              <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100">
-                <h5 className="font-bold text-slate-900 mb-1">How is the doorstep address validated?</h5>
+              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:border-emerald-200 transition">
+                <h5 className="font-extrabold text-slate-900 mb-1">How is the doorstep address validated?</h5>
                 <p>Address inputs require house/flat number, street name, city, and a valid 5-6 digit PIN code. You can also click "Detect GPS" to verify your exact physical coordinates.</p>
               </div>
 
-              <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100">
-                <h5 className="font-bold text-slate-900 mb-1">Where are my saved addresses located?</h5>
+              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:border-emerald-200 transition">
+                <h5 className="font-extrabold text-slate-900 mb-1">Where are my saved addresses located?</h5>
                 <p>Visit the new <strong>Profile</strong> tab in the navigation bar to add, edit, or set default pickup addresses (Home, Office, etc.).</p>
               </div>
 
-              <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100">
-                <h5 className="font-bold text-slate-900 mb-1">Does this require any backend server?</h5>
+              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:border-emerald-200 transition">
+                <h5 className="font-extrabold text-slate-900 mb-1">Does this require any backend server?</h5>
                 <p>No backend is required. All authentication states, addresses, and pickup logs are saved directly in browser LocalStorage, making this prototype 100% offline-ready.</p>
               </div>
             </div>
@@ -3260,7 +3316,7 @@
               <button
                 type="button"
                 onClick={onClose}
-                className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md shadow-emerald-600/20 transition active:scale-95"
+                className="btn-shimmer px-6 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold shadow-md shadow-emerald-600/25 transition active:scale-95"
               >
                 Got It
               </button>
